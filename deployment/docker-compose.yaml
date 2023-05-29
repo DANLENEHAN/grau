@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:9.6
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: testing123
+      POSTGRES_USER: dan
+      POSTGRES_DB: train
+    ports:
+      - 5432:5432
+
