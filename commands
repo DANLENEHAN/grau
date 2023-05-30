@@ -4,15 +4,8 @@ alembic upgrade head
 # Auto-generate revisions based on relation model file after target_metadata
 alembic revision --autogenerate -m "User table"
 
-
 # Working with flask
-# If Flask won't stop using the port
-# First we must add the FLASK_APP env variable to the flask server file name
-FLASK_APP = locus_server.py
-# Run the flask app and make it avaible to all connections on the network
-flask run --host=0.0.0.0. --port=5001
-# gunicorn
-gunicorn -w 4 -b 0.0.0.0 'scar:main()'
+flask run --host=0.0.0.0 --debug
 
 # Postgres https://postgresapp.com/
 # Terminal based front-end for Postgres
@@ -28,3 +21,6 @@ ALTER TABLE user MODIFY email varchar(100);
 
 # Git
 git rm -r --cached scar/__pycache__ 
+
+# format files
+black .
