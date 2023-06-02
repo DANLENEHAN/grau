@@ -5,6 +5,10 @@ alembic upgrade head
 alembic revision --autogenerate -m "User table"
 
 # Working with flask
+# Run flask app
+# You need to tell the Flask where your application is with the --app option
+# You can also set the FLASK_APP environment variable to the name of your application
+# Or you can name your file app.py and Flask will automatically find it
 flask run --host=0.0.0.0 --debug
 
 # Postgres https://postgresapp.com/
@@ -24,3 +28,9 @@ git rm -r --cached scar/__pycache__
 
 # format files
 black .
+
+# In order to run the tests we must install our app package in editable mode
+cd grau
+pip install -e .
+# Run tests
+pytest

@@ -5,18 +5,27 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Python: Current File",
+			"type": "python",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			"justMyCode": true
+		},
+		{
 			"name": "Python: Flask",
 			"type": "python",
 			"request": "launch",
 			"module": "flask",
 			"env": {
 				"FLASK_APP": "app.py",
-				"FLASK_DEBUG": "1"
+				"FLASK_DEBUG": "1",
+				"PYDEVD_DISABLE_FILE_VALIDATION": "1"
 			},
 			"args": [
 				"run",
 				"--host=0.0.0.0",
-				"--debug"
+				"--debugger"
 			],
 			"jinja": true,
 			"justMyCode": true

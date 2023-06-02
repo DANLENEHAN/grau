@@ -10,5 +10,4 @@ def get_session_factory():
     Session object.
     """
     engine = create_engine("postgresql+psycopg2://dan:testing123@localhost/train")
-    session_factory = sessionmaker(bind=engine)
-    return scoped_session(session_factory)
+    return sessionmaker(bind=engine)

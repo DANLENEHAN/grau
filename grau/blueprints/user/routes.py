@@ -1,8 +1,9 @@
 from flask import Blueprint, request
-import app
+import grau
 from marshmallow import ValidationError
 from grau.db.validation_schemas import UserSchema
 from grau.blueprints.user import functions
+from flask_sqlalchemy_session import current_session
 
 user_api = Blueprint("user_api", __name__)
 
@@ -11,7 +12,7 @@ user_api = Blueprint("user_api", __name__)
 def create_user():
     try:
         user = UserSchema().load(request.json)
-        return functions.create_user(app.Session(), user)
+        return functions.create_user(current_session, user)
     except ValidationError as exception:
         return exception.messages, 400
 
