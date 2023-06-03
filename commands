@@ -10,6 +10,8 @@ alembic revision --autogenerate -m "User table"
 # You can also set the FLASK_APP environment variable to the name of your application
 # Or you can name your file app.py and Flask will automatically find it
 flask run --host=0.0.0.0 --debug
+# Run flask app with python
+python -m flask run --host=0.0.0.0
 
 # Postgres https://postgresapp.com/
 # Terminal based front-end for Postgres
@@ -34,3 +36,33 @@ cd grau
 pip install -e .
 # Run tests
 pytest
+
+# Docker
+# By default the docker build command will look for a Dockerfile at
+# the root of the build context. The -f, --file, option lets you specify
+# the path to an alternative file to use instead. This is useful in cases
+# where the same set of files are used for multiple builds. The path must
+# be to a file within the build context. If a relative path is specified then it is
+# interpreted as relative to the root of the context.
+cd grau
+docker build -f ./docker -t grau:latest .
+
+# Run docker -d detached mode (in the background)
+# -p 5000:5000 map port 5000 from the container to port 5000 on the host
+docker run -d -p 5000:5000 grau:latest
+
+# Docker compose V2. Create the stack
+docker compose --file ./docker/docker-compose.yaml up 
+# up and down the stack
+docker compose --file ./docker/docker-compose.yaml down; docker compose --file ./docker/docker-compose.yaml up -d
+
+# Debugging/Container Access
+# docker exec -it CONTAINER_ID (only has to be first 3 chars)
+# allows you to execute commands in a container
+# Creates a terminal in the container
+docker exec -it CONTAINER_ID bash
+# list root directory
+docker exec -it CONTAINER_ID ls
+
+# In the container
+apt-get update; apt-get install nano;

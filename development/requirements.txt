@@ -1,2 +1,4 @@
-jupyter_core
+# Some dev packages
+jupyter
 requests
+black

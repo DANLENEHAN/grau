@@ -4,7 +4,6 @@ version = "1.0.0"
 dependencies = [
 		"Werkzeug==2.0.3",
 		"Flask==2.0.1",
-		"psycopg2==2.9.6",
 		"Flask-SQLAlchemy-Session==1.1",
 		"marshmallow==3.19.0",
 		"Flask-Cors==3.0.10",
