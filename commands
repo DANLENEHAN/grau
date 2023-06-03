@@ -9,7 +9,7 @@ alembic revision --autogenerate -m "User table"
 # You need to tell the Flask where your application is with the --app option
 # You can also set the FLASK_APP environment variable to the name of your application
 # Or you can name your file app.py and Flask will automatically find it
-flask run --host=0.0.0.0 --debug
+flask run --host=0.0.0.0 --debugger
 # Run flask app with python
 python -m flask run --host=0.0.0.0
 
@@ -31,8 +31,7 @@ git rm -r --cached scar/__pycache__
 # format files
 black .
 
-# In order to run the tests we must install our app package in editable mode
-cd grau
+# In order to run the tests we must install our grau app package in editable mode
 pip install -e .
 # Run tests
 pytest
@@ -44,8 +43,7 @@ pytest
 # where the same set of files are used for multiple builds. The path must
 # be to a file within the build context. If a relative path is specified then it is
 # interpreted as relative to the root of the context.
-cd grau
-docker build -f ./docker -t grau:latest .
+docker build -f ./docker/Dockerfile -t grau:latest .
 
 # Run docker -d detached mode (in the background)
 # -p 5000:5000 map port 5000 from the container to port 5000 on the host

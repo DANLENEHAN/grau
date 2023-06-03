@@ -21,11 +21,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
+import app as flask_app
 from grau.db.model import Base
 
 
 @pytest.fixture(scope="session")
-def db_session():
+def session_factory():
     """
     The fixture is configured with scope="session", which means that the connection
     will be established once per test session and shared among all the tests.
@@ -39,14 +40,30 @@ def db_session():
     Base.metadata.create_all(engine)
 
     session_factory = sessionmaker(bind=engine)
+
+    yield session_factory
+
+    # Teardown: Close the connection and clean up the database
+    Base.metadata.drop_all(engine)
+    engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def db_session(session_factory):
     Session = scoped_session(session_factory)
 
     yield Session
 
-    # Teardown: Close the connection and clean up the database
     Session.remove()
 
 
-@pytest.fixture
-def number():
-    return 1
+@pytest.fixture(scope="session")
+def app(session_factory):
+    app = flask_app.create_app(session_factory=session_factory)
+
+    yield app
+
+
+@pytest.fixture(scope="session")
+def client(app):
+    return app.test_client()
