@@ -1,2 +1,35 @@
-# grau
-Grau App
+############
+##Overview##
+############
+
+For the backend, we will be using a Flask application as the foundation. We will manage our SQL model maintenance and upgrades with alembic, while SQLAlchemy will handle our Python ORM operations. Backend caching will be implemented through a Redis server. Deployments will be facilitated by Docker. Our stack will be defined in a docker-compose file, and we will create a custom Dockerfile for our application. Additionally, there is a 'commands' file containing useful commands related to stack creation and interaction. The development directory provides support for working on our stack, currently featuring a basic Jupyter notebook for API interaction. However, note that this interaction method is not mandatory but rather a suggestion. Alternative options such as scripts or Postman can be used as well.
+
+
+#####################
+##Project Structure##
+#####################
+
+Our project follows a flat structure ‘https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#flat-layout’. If you examine the project directory ‘https://github.com/DANLENEHAN/grau’, you will notice this flat organization. Specifically focusing on the Flask API, you will find an 'app.py' file and a 'grau' directory. The 'grau' directory represents our installable package, containing all our API blueprints. It is important to note that a blueprint in Flask is not a pluggable app; instead, it is a set of operations that can be registered within an application, even multiple times. The 'app.py' file serves as the registration point for all our blueprints and is where the application itself is created. The advantage of separating app creation from our package is that we can create multiple app files, each registering all or subsets of our blueprints from our package. Consequently, we can easily create multiple instances of our APIs, ensuring scalability. However, with this distribution approach, we need to consider limiting users to a single login or implementing similar measures to avoid parallel updates. By placing 'grau' in a package, we can conveniently import it into our 'test' directory and unit test all its components and features effortlessly.
+
+To use our package, it must be installed. This is where the 'pyproject.toml' file comes into play. While it can accommodate various project-level configurations, our current usage revolves around the straightforward installation of 'grau'. You can observe the dependencies 'grau' requires to function correctly. To install 'grau', simply run 'pip install .' in the project directory, and you'll be ready to go. Finally, to run the Flask app, install the requirements found in the project directory and execute 'flask run --host=0.0.0.0 --debugger'. The reason we do not need to specify the Python file here is because 'app.py' and the 'create_app' function within the file are automatically recognized and invoked by 'flask run'. However, if either of them were renamed, this command would no longer function.
+
+
+#######################
+##Database Management##
+#######################
+
+For managing database migrations, we will utilize alembic. This powerful tool automates most of the work for us. Take a look at 'grau/db/model.py', and you will find the 'DeclarativeBase' class, which serves as the base class for all our models. It keeps track of the metadata from all the tables we create. We can split this model file into multiple files as long as they inherit from this base class. Alembic uses this base class to generate and execute migration scripts based on the database statistics combined with its knowledge of the base. For instance, alembic offers a highly useful function called "autogenerate," such as "alembic revision --autogenerate -m 'User table'". This command generates a migration script to reflect any changes made to our database model defined in 'model.py'. To run all the revisions and migration scripts, we use the command 'alembic upgrade head'. We will discuss how this process works in a production environment within the Docker deployment section. In summary, alembic enables us to upgrade the database exclusively by editing our DB model found in 'model.py'.
+
+
+#######################
+##Docker/Deployment####
+#######################
+
+Docker will be our chosen tool for deployment due to its ease of use, both locally and in the cloud. Currently, we have a single Dockerfile for our Flask app and a docker-compose file for our entire backend stack. The Dockerfile copies our 'alembic' and 'grau' folders, along with a few key files such as 'env.py' and 'app.py'. We have already discussed the purpose of 'app.py', but 'env.py' is crucial in a production-like environment. When developing locally, we start our database and manually apply any new migrations using alembic. However, in a deployment context, we need to be more intelligent. With 'env.py', we have implemented a waiting behavior (the implementation approach is subject to debate). The code speaks for itself, but essentially, it waits for the database to be up before exiting. Although we could run the migrations within this file, for now, we continue to use alembic to ensure predictable results, similar to our local development setup. So where is 'env.py' actually run? In a Dockerfile, we can execute various commands using the 'RUN' command. However, there are commands that we only want to run when the container has started. To achieve this, we utilize the 'CMD' command. In our 'CMD' command, we run the 'env.py' file (as described earlier), use alembic to run our migrations, and finally start the Flask app. The Flask app operates the same way as it does locally, with the installation of our 'grau' package and the use of the 'flask run' command. Although it currently functions as a development server, it is easy to transition it into a production environment by using a WSGI server (Web Server Gateway Interface) or similar solutions.
+
+
+############
+##Testing###
+############
+
+We have installed our 'grau' app, enabling all tests in the '/test' directory to access any component within the package for unit testing purposes. Currently, we have a single 'confest.py' file in our test directory, which is responsible for creating fixtures. Any fixtures created here can be utilized by tests in the current directory or any subdirectories. If needed, fixtures can be overwritten by new ones in the subdirectories. In our 'confest.py', we have defined several critical fixtures that, in combination with our installable 'grau' package, allow us to thoroughly test every aspect of our stack. The 'session_factory' fixture creates an in-memory SQLite database and creates all the tables defined in our 'model.py' file. The 'db_session' takes this fixture and creates a session to the database, enabling direct connections and the ability to test any database-related operations. The 'app' and 'client' fixtures create a mock Flask API, enabling end-to-end testing of API requests rather than solely focusing on package structures. Notice that all these fixtures have a scope parameter set as 'scope="session"'. This means that the connection will be established once per test session and shared among all tests. The `yield` statements separate the setup and teardown code. After yielding the connection, pytest executes the teardown code, which closes the connection and cleans up the database.
