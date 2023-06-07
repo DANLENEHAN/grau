@@ -8,7 +8,7 @@ import uuid
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy_session import flask_scoped_session
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager
 from sqlalchemy.orm import sessionmaker
 
 from grau.blueprints.user.routes import user_api
@@ -17,7 +17,7 @@ from grau.db.model import User
 from grau.utils import get_secret_key, decrypt_str
 
 
-def create_app(session_factory: sessionmaker = get_session_maker()):
+def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
     app = Flask(__name__)
     app.register_blueprint(user_api)
     add_app_config(app)
@@ -28,7 +28,7 @@ def create_app(session_factory: sessionmaker = get_session_maker()):
     CORS(app)
 
     @login_manager.user_loader
-    def load_user(user_id: str):
+    def load_user(user_id: str) -> User:
         """Loads a user from the database. The user ID is encrypted to
         prevent leaking the ID to the client."""
         print(f"Loading user with encrypted ID: {user_id}")
@@ -49,7 +49,7 @@ def create_app(session_factory: sessionmaker = get_session_maker()):
         request.environ["request_id"] = request_id
 
     @app.after_request
-    def after_request(response):
+    def after_request(response: Flask.response_class) -> Flask.response_class:
         """After request hook removes the request ID from the request
         environment. This is to ensure that the request ID is not
         leaked to the client. Could be left in for debugging purposes
@@ -72,15 +72,10 @@ def create_app(session_factory: sessionmaker = get_session_maker()):
         db_session.bind.engine.connect()
         return "ok"
 
-    @app.route("/test_auth")
-    @login_required
-    def test_auth():
-        return jsonify({"status": "user authenticated"})
-
     return app
 
 
-def add_app_config(app: Flask):
+def add_app_config(app: Flask) -> None:
     """
     Adds configuration to the app.
     """

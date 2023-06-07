@@ -15,7 +15,9 @@ For more information on fixtures and plugins, refer to the pytest documentation:
 
 """
 
+import os
 import pytest
+from unittest.mock import patch
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
@@ -25,7 +27,15 @@ import app as flask_app
 from grau.db.model import Base
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(autouse=True)
+def mock_settings_env_vars():
+    with patch.dict(
+        os.environ, {"APP_SECRET": "WDoxnMneVvbkb-VMAVNSDHDvEZjfjzrlPpLVQdYTQd0="}
+    ):
+        yield
+
+
+@pytest.fixture(scope="module")
 def session_factory():
     """
     The fixture is configured with scope="session", which means that the connection
@@ -43,12 +53,13 @@ def session_factory():
 
     yield session_factory
 
+    print("Tearing down database")
     # Teardown: Close the connection and clean up the database
     Base.metadata.drop_all(engine)
     engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def db_session(session_factory):
     Session = scoped_session(session_factory)
 
@@ -57,13 +68,13 @@ def db_session(session_factory):
     Session.remove()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def app(session_factory):
     app = flask_app.create_app(session_factory=session_factory)
 
     yield app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def client(app):
     return app.test_client()
