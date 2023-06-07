@@ -53,7 +53,6 @@ def session_factory():
 
     yield session_factory
 
-    print("Tearing down database")
     # Teardown: Close the connection and clean up the database
     Base.metadata.drop_all(engine)
     engine.dispose()
