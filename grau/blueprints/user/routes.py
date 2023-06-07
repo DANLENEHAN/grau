@@ -1,9 +1,10 @@
-from flask import Blueprint, request
-import grau
-from marshmallow import ValidationError
-from grau.db.validation_schemas import UserSchema
-from grau.blueprints.user import functions
+from flask import Blueprint, request, session
 from flask_sqlalchemy_session import current_session
+from marshmallow import ValidationError
+
+from grau.db.validation_schemas import UserSchema
+from grau.blueprints.user.functions import attempt_login, attempt_logout
+from grau.blueprints.user import functions
 
 user_api = Blueprint("user_api", __name__)
 
@@ -17,14 +18,16 @@ def create_user():
         return exception.messages, 400
 
 
-@user_api.route("/login")
+@user_api.route("/login", methods=["POST"])
 def login():
-    return "Login"
+    return attempt_login(
+        current_session, request.json["email"], request.json["password"]
+    )
 
 
-@user_api.route("/logout")
+@user_api.route("/logout", methods=["POST"])
 def logout():
-    return "Logout"
+    return attempt_logout(current_session, session.get("_user_id"))
 
 
 @user_api.route("/profile")

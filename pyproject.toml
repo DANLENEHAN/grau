@@ -7,6 +7,8 @@ dependencies = [
 		"Flask-SQLAlchemy-Session==1.1",
 		"marshmallow==3.19.0",
 		"Flask-Cors==3.0.10",
+		"Flask-Login==0.6.2",
+		"cryptography==41.0.1",
 ]
 
 [build-system]

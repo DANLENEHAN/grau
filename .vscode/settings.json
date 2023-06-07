@@ -10,5 +10,17 @@
 		".",
 		"-p",
 		"*test.py"
+	],
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 5432,
+			"driver": "PostgreSQL",
+			"name": "local",
+			"database": "train",
+			"username": "dan",
+			"password": "testing123"
+		}
 	]
 }
