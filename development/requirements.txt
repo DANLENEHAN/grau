@@ -1,5 +1,5 @@
+black
 # Some dev packages
 jupyter
-requests
-black
 pre-commit
+requests

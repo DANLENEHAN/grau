@@ -7,11 +7,15 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from grau.utils import encrypt_str
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase):  # noqa pylint: disable=C0115
     pass
 
 
 class User(UserMixin, Base):
+    """
+    User model for the database.
+    """
+
     __tablename__ = "user_account"
     id: Mapped[int] = mapped_column(primary_key=True)
     fullname: Mapped[Optional[str]] = mapped_column(String(100))

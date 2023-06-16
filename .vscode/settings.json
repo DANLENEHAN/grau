@@ -1,26 +1,26 @@
 {
-	"python.testing.pytestArgs": [
-		"tests"
-	],
-	"python.testing.unittestEnabled": false,
-	"python.testing.pytestEnabled": true,
-	"python.testing.unittestArgs": [
-		"-v",
-		"-s",
-		".",
-		"-p",
-		"*test.py"
-	],
-	"sqltools.connections": [
-		{
-			"previewLimit": 50,
-			"server": "localhost",
-			"port": 5432,
-			"driver": "PostgreSQL",
-			"name": "local",
-			"database": "train",
-			"username": "dan",
-			"password": "testing123"
-		}
-	]
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.unittestEnabled": false,
+    "sqltools.connections": [
+        {
+            "database": "train",
+            "driver": "PostgreSQL",
+            "name": "local",
+            "password": "testing123",
+            "port": 5432,
+            "previewLimit": 50,
+            "server": "localhost",
+            "username": "dan"
+        }
+    ]
 }

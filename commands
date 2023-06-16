@@ -68,3 +68,12 @@ docker exec -it CONTAINER_ID ls
 
 # In the container
 apt-get update; apt-get install nano;
+
+
+# Pre-Commit Hooks
+## To install (Must be done once and it will then work automatically on commits)
+pre-commit install
+## To run manually on all files
+pre-commit run --all-files
+## To avoid pre-commit hooks when commiting
+git commit --no-verify

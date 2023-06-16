@@ -28,9 +28,7 @@ from grau.db.model import Base
 
 @pytest.fixture(scope="module", autouse=True)
 def mock_settings_env_vars():
-    with patch.dict(
-        os.environ, {"APP_SECRET": "WDoxnMneVvbkb-VMAVNSDHDvEZjfjzrlPpLVQdYTQd0="}
-    ):
+    with patch.dict(os.environ, {"APP_SECRET": "WDoxnMneVvbkb-VMAVNSDHDvEZjfjzrlPpLVQdYTQd0="}):
         yield
 
 

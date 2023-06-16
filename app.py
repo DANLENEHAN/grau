@@ -18,6 +18,13 @@ from grau.utils import decrypt_str, get_secret_key
 
 
 def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
+    """
+    Creates the Flask app and registers the blueprints.
+    Args:
+        session_factory (sessionmaker): SQLAlchemy session factory
+    Returns:
+        Flask: Flask app
+    """
     app = Flask(__name__)
     app.register_blueprint(user_api)
     add_app_config(app)
@@ -29,14 +36,16 @@ def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
 
     @login_manager.user_loader
     def load_user(user_id: str) -> User:
-        """Loads a user from the database. The user ID is encrypted to
-        prevent leaking the ID to the client."""
+        """
+        Function loads a user from the database. The user ID is encrypted to
+        prevent leaking the ID to the client.
+        Args:
+            user_id (str): encrypted user ID
+        Returns:
+            User: User object from the database
+        """
         print(f"Loading user with encrypted ID: {user_id}")
-        return (
-            db_session.query(User)
-            .filter(User.session_id == decrypt_str(user_id))
-            .one_or_none()
-        )
+        return db_session.query(User).filter(User.session_id == decrypt_str(user_id)).one_or_none()
 
     @app.before_request
     def before_request():
