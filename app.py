@@ -5,16 +5,16 @@ API entry point. All routes are registered here.
 
 import uuid
 
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_sqlalchemy_session import flask_scoped_session
 from flask_login import LoginManager
+from flask_sqlalchemy_session import flask_scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from grau.blueprints.user.routes import user_api
 from grau.db.functions import get_session_maker
 from grau.db.model import User
-from grau.utils import get_secret_key, decrypt_str
+from grau.utils import decrypt_str, get_secret_key
 
 
 def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:

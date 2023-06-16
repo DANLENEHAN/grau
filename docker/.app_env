@@ -1,0 +1,2 @@
+APP_SECRET="XN-iJVBFzrohbtPhw6pVUh3CTsc14pV993uEhNUXVxw="
+DATABASE_URL=postgresql+psycopg2://dan:testing123@db/train

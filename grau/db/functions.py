@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import sessionmaker
 import os
+
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 def get_db_engine() -> Engine:

@@ -1,9 +1,9 @@
 services:
   app:
     image: grau:latest
+    env_file:
+      - .app_env
     restart: always
-    environment:
-      DATABASE_URL: postgresql+psycopg2://dan:testing123@db/train
     ports:
       - 5000:5000
     depends_on:
@@ -11,10 +11,7 @@ services:
   db:
     image: postgres:9.6
     restart: always
-    environment:
-      POSTGRES_PASSWORD: testing123
-      POSTGRES_USER: dan
-      POSTGRES_DB: train
+    env_file:
+      - .db_env
     ports:
       - 5432:5432
-
