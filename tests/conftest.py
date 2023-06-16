@@ -16,12 +16,11 @@ For more information on fixtures and plugins, refer to the pytest documentation:
 """
 
 import os
-import pytest
 from unittest.mock import patch
 
+import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 import app as flask_app
 from grau.db.model import Base

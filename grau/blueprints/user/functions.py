@@ -5,7 +5,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import scoped_session
 
 from grau.db.model import User
-from grau.utils import encrypt_str, decrypt_str
+from grau.utils import decrypt_str, encrypt_str
 
 
 def get_user(db_session: scoped_session, email: str) -> User:

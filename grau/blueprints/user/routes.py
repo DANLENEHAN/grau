@@ -1,8 +1,9 @@
 from flask import Blueprint, request, session
 from flask_login import login_required
 from flask_sqlalchemy_session import current_session
-from grau.blueprints.user.functions import attempt_login, attempt_logout
+
 from grau.blueprints.user import functions
+from grau.blueprints.user.functions import attempt_login, attempt_logout
 
 user_api = Blueprint("user_api", __name__)
 

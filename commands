@@ -26,7 +26,7 @@ psql -h localhost -d train -U dan
 ALTER TABLE user MODIFY email varchar(100);
 
 # Git
-git rm -r --cached scar/__pycache__ 
+git rm -r --cached scar/__pycache__
 
 # format files
 black .
@@ -49,8 +49,12 @@ docker build -f ./docker/Dockerfile -t grau:latest .
 # -p 5000:5000 map port 5000 from the container to port 5000 on the host
 docker run -d -p 5000:5000 grau:latest
 
+
+# Check Docker config
+docker compose --file ./docker/docker-compose.yaml config
+
 # Docker compose V2. Create the stack
-docker compose --file ./docker/docker-compose.yaml up 
+docker compose --file ./docker/docker-compose.yaml up -d
 # up and down the stack
 docker compose --file ./docker/docker-compose.yaml down; docker compose --file ./docker/docker-compose.yaml up -d
 

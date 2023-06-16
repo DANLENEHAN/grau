@@ -1,7 +1,6 @@
+import configparser
 import os
 import time
-
-import configparser
 
 from grau.db.functions import get_db_engine
 
