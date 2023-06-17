@@ -21,7 +21,7 @@ def get_user(db_session: scoped_session, email: str) -> User:
     return db_session.query(User).filter(User.email == email).one_or_none()
 
 
-def create_user(db_session: scoped_session, user_dict: Dict[str:str]) -> Tuple[str, int]:
+def create_user(db_session: scoped_session, user_dict: Dict[str, str]) -> Tuple[str, int]:
     """
     Function to create a user in the database
     Args:
