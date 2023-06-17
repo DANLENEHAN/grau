@@ -41,6 +41,12 @@ repos:
       - id: pylint
         name: pylint
         entry: pylint
+        exclude: ^alembic/.*
         language: system
         types: [python]
         args: [--rcfile=.pylintrc, --output-format=colorized]
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.3.0
+    hooks:
+    -   id: mypy
+        exclude: ^alembic/.*

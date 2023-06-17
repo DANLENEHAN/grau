@@ -11,7 +11,7 @@ class UserSchema(Schema):
     password = fields.Str(required=True, validate=validate.Length(min=8))
 
     @validates("fullname")
-    def validate_fullname(self, value): # noqa pylint: disable=R0201
+    def validate_fullname(self, value):  # noqa pylint: disable=R0201
         """
         Validates the fullname field
         """

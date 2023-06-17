@@ -34,7 +34,7 @@ def create_user(db_session: scoped_session, user_dict: Dict[str, str]) -> Tuple[
     user = User(**user_dict)
 
     if get_user(db_session, user.email):
-        return {"email": "email already assoicated with account"}, 400
+        return "Email already assoicated with account", 400
 
     user.status = "active"
     db_session.add(user)
