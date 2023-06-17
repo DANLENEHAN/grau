@@ -1,21 +1,13 @@
-from marshmallow import Schema, ValidationError, fields, validate, validates
+from typing import Annotated
+
+from pydantic import BaseModel, EmailStr, constr
 
 
-class UserSchema(Schema):
+class UserSchema(BaseModel):
     """
     Schema for validating user data
     """
 
-    email = fields.Email(required=True)
-    fullname = fields.Str(required=True, validate=validate.Length(min=9))
-    password = fields.Str(required=True, validate=validate.Length(min=8))
-
-    @validates("fullname")
-    def validate_fullname(self, value):  # noqa pylint: disable=R0201
-        """
-        Validates the fullname field
-        """
-        if not value.replace(" ", "").isalpha():
-            raise ValidationError("Full name must contain only letters")
-        if len(value.split(" ")) < 2:
-            raise ValidationError("Full name must contain first and last name")
+    fullname: Annotated[str, constr(min_length=10, max_length=100, regex=r"^[A-Za-z]+\s[A-Za-z]+$")]
+    email: EmailStr
+    password: Annotated[str, constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$")]

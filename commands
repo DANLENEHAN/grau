@@ -71,7 +71,8 @@ apt-get update; apt-get install nano;
 
 
 # Pre-Commit Hooks
-## To install (Must be done once and it will then work automatically on commits)
+brew install pre-commit or pip install pre-commit
+## To install the git hook scripts (Must be done once and it will then work automatically on commits)
 pre-commit install
 ## To run manually on all files
 pre-commit run --all-files
