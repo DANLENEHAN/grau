@@ -7,8 +7,12 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from grau.utils import encrypt_str
 
 
-class Base(DeclarativeBase):  # noqa pylint: disable=C0115
-    pass
+class Base(DeclarativeBase):
+    """
+    Base class for all models.
+    """
+
+    pass  # noqa pylint: disable=W0107
 
 
 class User(UserMixin, Base):
