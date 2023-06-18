@@ -1,5 +1,5 @@
 [FORMAT]
-max-line-length = 120
+max-line-length = 79
 
 [MASTER]
 ignore = .git, __pycache__, .venv, setup.py, conftest.py, env.py, alembic, alembic.ini

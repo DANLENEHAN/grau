@@ -45,7 +45,11 @@ def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
             User: User object from the database
         """
         print(f"Loading user with encrypted ID: {user_id}")
-        return db_session.query(User).filter(User.session_id == decrypt_str(user_id)).one_or_none()
+        return (
+            db_session.query(User)
+            .filter(User.session_id == decrypt_str(user_id))
+            .one_or_none()
+        )
 
     @app.before_request
     def before_request():

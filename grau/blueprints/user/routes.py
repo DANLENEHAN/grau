@@ -21,7 +21,9 @@ def login():
     """
     Login endpoint for users.
     """
-    return attempt_login(current_session, request.json["email"], request.json["password"])
+    return attempt_login(
+        current_session, request.json["email"], request.json["password"]
+    )
 
 
 @user_api.route("/logout", methods=["POST"])
