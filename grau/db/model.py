@@ -38,4 +38,5 @@ class User(UserMixin, Base):
         return encrypt_str(str(self.session_id))
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+        # TODO: Add name field to user model
+        return f"User(id={self.id!r}, fullname={self.fullname!r})"  # , name={self.name!r}"
