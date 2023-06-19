@@ -28,7 +28,7 @@ class TestUtils:
         # then
         assert actual == expected
 
-    def test_get_secret_key_none(self):  # noqa pylint: disable=R0201
+    def test_get_secret_key_none(self):
         """
         Test that the function returns None if
         the APP_SECRET

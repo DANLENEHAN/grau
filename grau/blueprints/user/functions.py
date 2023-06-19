@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user
 from sqlalchemy import and_
 from sqlalchemy.orm import scoped_session
 
-from grau.db.model import User
+from grau.db.user.user_model import User
 from grau.utils import decrypt_str, encrypt_str
 
 
