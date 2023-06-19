@@ -21,7 +21,9 @@ def get_user(db_session: scoped_session, email: str) -> User:
     return db_session.query(User).filter(User.email == email).one_or_none()
 
 
-def create_user(db_session: scoped_session, user_dict: Dict[str, str]) -> Tuple[str, int]:
+def create_user(
+    db_session: scoped_session, user_dict: Dict[str, str]
+) -> Tuple[str, int]:
     """
     Function to create a user in the database
     Args:
@@ -42,7 +44,9 @@ def create_user(db_session: scoped_session, user_dict: Dict[str, str]) -> Tuple[
     return "User created successfully", 201
 
 
-def attempt_login(db_session: scoped_session, email: str, password: str) -> Tuple[str, int]:
+def attempt_login(
+    db_session: scoped_session, email: str, password: str
+) -> Tuple[str, int]:
     """
     Function to attempt to login a user
     Args:
@@ -61,7 +65,9 @@ def attempt_login(db_session: scoped_session, email: str, password: str) -> Tupl
     return "Login failed, invalid credentials", 400
 
 
-def attempt_logout(db_session: scoped_session, session_id: str) -> Tuple[str, int]:
+def attempt_logout(
+    db_session: scoped_session, session_id: str
+) -> Tuple[str, int]:
     """
     Function to attempt to logout a user
     Args:
@@ -70,7 +76,11 @@ def attempt_logout(db_session: scoped_session, session_id: str) -> Tuple[str, in
     Returns:
         tuple[str, int]: tuple containing the response message and status code
     """
-    user = db_session.query(User).filter(and_(User.session_id == decrypt_str(session_id))).one_or_none()
+    user = (
+        db_session.query(User)
+        .filter(and_(User.session_id == decrypt_str(session_id)))
+        .one_or_none()
+    )
     if user:
         user.session_id = None
         db_session.commit()

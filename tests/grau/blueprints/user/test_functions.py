@@ -32,7 +32,10 @@ def test_login_user(client):
     """
     response = client.post(
         "/login",
-        json={"email": SAMPLE_USER["email"], "password": SAMPLE_USER["password"]},
+        json={
+            "email": SAMPLE_USER["email"],
+            "password": SAMPLE_USER["password"],
+        },
     )
     assert response.status_code == 200
     assert response.data == b"Login successful"
