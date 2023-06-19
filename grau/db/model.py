@@ -8,10 +8,18 @@ from grau.utils import encrypt_str
 
 
 class Base(DeclarativeBase):
-    pass
+    """
+    Base class for all models.
+    """
+
+    pass  # noqa pylint: disable=W0107
 
 
 class User(UserMixin, Base):
+    """
+    User model for the database.
+    """
+
     __tablename__ = "user_account"
     id: Mapped[int] = mapped_column(primary_key=True)
     fullname: Mapped[Optional[str]] = mapped_column(String(100))
@@ -30,4 +38,4 @@ class User(UserMixin, Base):
         return encrypt_str(str(self.session_id))
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+        return f"User(id={self.id!r}, fullname={self.fullname!r})"

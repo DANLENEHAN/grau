@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from cryptography.fernet import Fernet
 
@@ -10,7 +11,7 @@ def get_secret_key():
     return os.getenv("APP_SECRET")
 
 
-def encrypt_str(secret_str: str, secret_key: str = None) -> str:
+def encrypt_str(secret_str: str, secret_key: Optional[str] = None) -> str:
     """
     Encrypts a string using a secret key.
     """
@@ -20,7 +21,7 @@ def encrypt_str(secret_str: str, secret_key: str = None) -> str:
     return f.encrypt(secret_str.encode()).decode()
 
 
-def decrypt_str(secret_str: str, secret_key: str = None) -> str:
+def decrypt_str(secret_str: str, secret_key: Optional[str] = None) -> str:
     """
     Decrypts a string using a secret key.
     """

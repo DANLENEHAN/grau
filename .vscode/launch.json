@@ -1,31 +1,31 @@
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Python: Current File",
-			"type": "python",
-			"request": "launch",
-			"program": "${file}",
-			"console": "integratedTerminal",
-			"justMyCode": true
-		},
-		{
-			"name": "Python: Flask",
-			"type": "python",
-			"request": "launch",
-			"module": "flask",
-			"env": {
-				"FLASK_APP": "app.py",
-				"FLASK_DEBUG": "1",
-				"PYDEVD_DISABLE_FILE_VALIDATION": "1"
-			},
-			"args": [
-				"run",
-				"--host=0.0.0.0",
-				"--debugger"
-			],
-			"jinja": true,
-			"justMyCode": true
-		}
-	]
+    "configurations": [
+        {
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "name": "Python: Current File",
+            "program": "${file}",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "run",
+                "--host=0.0.0.0",
+                "--debugger"
+            ],
+            "env": {
+                "FLASK_APP": "app.py",
+                "FLASK_DEBUG": "1",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+            },
+            "jinja": true,
+            "justMyCode": true,
+            "module": "flask",
+            "name": "Python: Flask",
+            "request": "launch",
+            "type": "python"
+        }
+    ],
+    "version": "0.2.0"
 }

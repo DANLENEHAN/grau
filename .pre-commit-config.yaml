@@ -2,19 +2,27 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-    -   id: check-byte-order-marker  # Forbid UTF-8 byte-order markers
-    # Check for files with names that would conflict on a case-insensitive
-    # filesystem like MacOS HFS+ or Windows FAT.
+    # https://github.com/pre-commit/pre-commit-hooks
+    -   id: check-ast
+    -   id: check-merge-conflict
     -   id: check-case-conflict
     -   id: check-json
     -   id: check-yaml
+    -   id: check-toml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
     -   id: mixed-line-ending
+    -   id: no-commit-to-branch
+    -   id: pretty-format-json
+        args:
+          - "--autofix"
+          - "--indent=4"
+    -   id: requirements-txt-fixer
 -   repo: https://github.com/psf/black
     rev: 23.3.0
     hooks:
     -   id: black
+        language_version: python3.11
 -   repo: https://github.com/asottile/blacken-docs
     rev: 1.14.0
     hooks:
@@ -28,3 +36,21 @@ repos:
     rev: v5.10.1
     hooks:
     -   id: isort
+-   repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        exclude: ^alembic/.*
+        language: system
+        types: [python]
+        args: [--rcfile=.pylintrc, --output-format=colorized]
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.3.0
+    hooks:
+    -   id: mypy
+        exclude: ^alembic/.*
+- repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+  rev: v0.1.0
+  hooks:
+    - id: dockerfilelint
