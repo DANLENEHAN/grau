@@ -91,10 +91,10 @@ class UserSchema(BaseModel):
     ]
 
     created_at: timedelta = datetime_to_string(
-        datetime.now(), date_format=TimestampFormat.YMD.value
+        datetime.now(), date_format=TimestampFormat.YMD
     )
     updated_at: timedelta = datetime_to_string(
-        datetime.now(), date_format=TimestampFormat.YMD.value
+        datetime.now(), date_format=TimestampFormat.YMD
     )
 
     status: UserStatus = UserStatus.ACTIVE
@@ -120,5 +120,5 @@ class UserSchema(BaseModel):
     language: str
 
     _validate_birthday = validator("birthday", allow_reuse=True)(
-        validate_date_field
+        lambda birthday: validate_date_field(birthday, date_format=DateFormat.YMD)
     )
