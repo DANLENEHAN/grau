@@ -1,15 +1,14 @@
-from enum import Enum
-from typing import Optional
-
 from datetime import datetime
+from enum import Enum
+from typing import Annotated, Optional
+
 from flask_login import UserMixin
 from pydantic import BaseModel, EmailStr, constr
-from sqlalchemy import String, Integer, DateTime, TIMESTAMP, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
-from typing import Annotated
+from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from grau.utils import encrypt_str
 from grau.db.model import Base
+from grau.utils import encrypt_str
 
 
 class UserStatus(Enum):
@@ -62,6 +61,8 @@ class User(UserMixin, Base):
     date_format_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     language: Mapped[str] = mapped_column(String(50), nullable=True)
 
+    user_stats = relationship("UserStats", back_populates="user")
+
     def get_id(self) -> str:
         """_summary_
         We encrypt the session ID so that it is not leaked to the client.
@@ -71,7 +72,11 @@ class User(UserMixin, Base):
         return encrypt_str(str(self.session_id))
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, fullname={self.fullname!r})"
+        return (
+            f"User(id={self.id!r},"
+            "fullname={self.first_name!r},"
+            "{self.last_name!r}, email={self.email})"
+        )
 
 
 class UserSchema(BaseModel):

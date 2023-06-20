@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 
 from grau.blueprints.user.routes import user_api
 from grau.db.functions import get_session_maker
-from grau.db.model import User
+from grau.db.user.user_model import User
 from grau.utils import decrypt_str, get_secret_key
 
 

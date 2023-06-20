@@ -1,4 +1,5 @@
-from typing import Dict, Tuple
+from datetime import datetime
+from typing import Any, Dict, Tuple
 from uuid import uuid4
 
 from flask_login import login_user, logout_user
@@ -22,7 +23,7 @@ def get_user(db_session: scoped_session, email: str) -> User:
 
 
 def create_user(
-    db_session: scoped_session, user_dict: Dict[str, str]
+    db_session: scoped_session, user_dict: Dict[str, Any]
 ) -> Tuple[str, int]:
     """
     Function to create a user in the database
@@ -33,6 +34,12 @@ def create_user(
         tuple[str, int]: tuple containing the response message and status code
     """
     user_dict["password"] = encrypt_str(user_dict["password"])
+    user_dict["created_at"] = datetime.now()
+    user_dict["updated_at"] = datetime.now()
+    user_dict["birthday"] = datetime.strptime(
+        user_dict["birthday"], "%Y-%m-%d"
+    )
+    print(user_dict)
     user = User(**user_dict)
 
     if get_user(db_session, user.email):

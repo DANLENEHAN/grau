@@ -19,11 +19,14 @@ import os
 from unittest.mock import patch
 
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import app as flask_app
+from grau.blueprints.user_stats.functions import create_user_stats
 from grau.db.model import Base
+from grau.db.user_stats.user_stats_model import UserStats
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -77,3 +80,18 @@ def app(session_factory):
 @pytest.fixture(scope="module")
 def client(app):
     return app.test_client()
+
+
+@pytest.fixture(scope="function")
+def insert_user_stat(db_session):
+    user_stat = {"user_id": 1, "id": 1, "value": 100, "unit": "kg"}
+    create_user_stats(db_session, user_stat)
+    yield user_stat
+    db_session.query(UserStats).delete()
+    db_session.commit()
+
+
+@pytest.fixture
+def frozen_datetime():
+    with freeze_time("2023-01-01"):
+        yield

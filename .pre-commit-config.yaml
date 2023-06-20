@@ -49,7 +49,7 @@ repos:
     rev: v1.3.0
     hooks:
     -   id: mypy
-        exclude: ^alembic/.*
+        exclude: ^alembic/.*,^tests/.*
 - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
   rev: v0.1.0
   hooks:
