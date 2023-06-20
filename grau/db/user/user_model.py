@@ -1,15 +1,16 @@
+from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Annotated, Optional
 
-from datetime import datetime
 from flask_login import UserMixin
-from pydantic import BaseModel, EmailStr, constr
-from sqlalchemy import String, Integer, DateTime, TIMESTAMP, Boolean
+from pydantic import BaseModel, EmailStr, HttpUrl, conint, constr, validator
+from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from typing import Annotated
 
-from grau.utils import encrypt_str
+from grau.db.enums import DateFormat, HeightUnits, TimestampFormat, WeightUnits
+from grau.db.functions import datetime_to_string, validate_date_field
 from grau.db.model import Base
+from grau.utils import encrypt_str
 
 
 class UserStatus(Enum):
@@ -56,7 +57,7 @@ class User(UserMixin, Base):
     last_name: Mapped[str] = mapped_column(String(100), nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
     phone_number: Mapped[str] = mapped_column(String(50), nullable=True)
-    area_code: Mapped[str] = mapped_column(String(50), nullable=True)
+    area_code: Mapped[str] = mapped_column(String(20), nullable=True)
     height_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     weight_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     date_format_pref: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -79,8 +80,45 @@ class UserSchema(BaseModel):
     Schema for validating user data
     """
 
+    username: Annotated[
+        str,
+        constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9]+$"),
+    ]
     email: EmailStr
     password: Annotated[
         str,
         constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$"),
     ]
+
+    created_at: timedelta = datetime_to_string(
+        datetime.now(), date_format=TimestampFormat.YMD.value
+    )
+    updated_at: timedelta = datetime_to_string(
+        datetime.now(), date_format=TimestampFormat.YMD.value
+    )
+
+    status: UserStatus = UserStatus.ACTIVE
+    profile_link: HttpUrl
+    premium: bool = False
+
+    age: Annotated[int, conint(ge=0, le=150)]
+    birthday: datetime
+    first_name: Annotated[
+        str, constr(min_length=8, max_length=50, regex=r"^[A-Za-z0-9]+$")
+    ]
+    last_name: Annotated[
+        str, constr(min_length=8, max_length=50, regex=r"^[A-Za-z0-9]+$")
+    ]
+    gender: Gender
+
+    phone_number: Annotated[int, conint(ge=99999999999999, le=999999999999999)]
+    # https://countrycode.org/
+    area_code: Annotated[str, constr(min_length=2, max_length=10)]
+    height_unit_pref: HeightUnits
+    weight_unit_pref: WeightUnits
+    date_format_pref: DateFormat
+    language: str
+
+    _validate_birthday = validator("birthday", allow_reuse=True)(
+        validate_date_field
+    )
