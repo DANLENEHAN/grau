@@ -26,10 +26,12 @@ def datetime_to_string(
     return date.strftime(date_format.value)
 
 
-def validate_date_field(date: str, date_format: DateFormat = DateFormat.YMD):
-    """Validate a date field."""
+def validate_date_field(
+    date: str, date_format: DateFormat = DateFormat.YMD.value
+):
+    """Validate a date string based on date format"""
     try:
-        datetime.strptime(date, date_format.value)
+        datetime.strptime(date, date_format)
     except ValueError:
         return False
     return True

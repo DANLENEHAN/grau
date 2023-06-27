@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from typing import Optional
 
 from cryptography.fernet import Fernet
@@ -29,3 +30,11 @@ def decrypt_str(secret_str: str, secret_key: Optional[str] = None) -> str:
         secret_key = get_secret_key()
     f = Fernet(secret_key)
     return f.decrypt(secret_str.encode()).decode()
+
+
+def validate_enum_member(enum: Enum, value: any) -> bool:
+    if value in [m.value for m in enum.__members__.values()]:
+        return value
+    raise ValueError(
+        f"Value '{value}' does not belong to Enum class '{__name__}'"
+    )
