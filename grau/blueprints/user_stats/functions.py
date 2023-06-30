@@ -35,7 +35,6 @@ def create_user_stats(
     """
     user_stats_dict["created_at"] = datetime.now()
     user_stats_dict["updated_at"] = datetime.now()
-
     user_stats = UserStats(**user_stats_dict)
     db_session.add(user_stats)
     db_session.commit()
@@ -66,6 +65,12 @@ def update_user_stat(
 ) -> Tuple[str, int]:
     """
     Update individual user stat in the database.
+    Args:
+        db_session (scoped_session): SQLAlchemy scoped session
+        user_stats_dict (dict[str:str]): dictionary containing user
+            stats information
+    Returns:
+        tuple[str, int]: tuple containing the response message and status code
     """
     user_stats = get_user_stat(
         db_session, user_stats_dict["user_id"], user_stats_dict["id"]

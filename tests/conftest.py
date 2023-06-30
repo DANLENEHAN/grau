@@ -24,9 +24,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import app as flask_app
+from grau.blueprints.user.functions import create_user
 from grau.blueprints.user_stats.functions import create_user_stats
 from grau.db.model import Base
 from grau.db.user_stats.user_stats_model import UserStats
+from grau.utils import decrypt_str
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -84,14 +86,42 @@ def client(app):
 
 @pytest.fixture(scope="function")
 def insert_user_stat(db_session):
-    user_stat = {"user_id": 1, "id": 1, "value": 100, "unit": "kg"}
-    create_user_stats(db_session, user_stat)
-    yield user_stat
-    db_session.query(UserStats).delete()
-    db_session.commit()
+    def _insert_user_stat(user_stat):
+        create_user_stats(db_session, user_stat)
+        db_session.commit()
+        return user_stat
+
+    return _insert_user_stat
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
+def insert_user(db_session):
+    def _insert_user(user):
+        _, response_code = create_user(db_session, user)
+        assert response_code == 201
+        db_session.commit()
+
+        return user
+
+    return _insert_user
+
+
+@pytest.fixture()
 def frozen_datetime():
     with freeze_time("2023-01-01"):
         yield
+
+
+@pytest.fixture()
+def login_user(client):
+    def _login_user(user):
+        response = client.post(
+            "/login",
+            json={
+                "email": user["email"],
+                "password": decrypt_str(user["password"]),
+            },
+        )
+        assert response.status_code == 200
+
+    return _login_user

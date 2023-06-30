@@ -39,7 +39,6 @@ def create_user(
     user_dict["birthday"] = datetime.strptime(
         user_dict["birthday"], "%Y-%m-%d"
     )
-    print(user_dict)
     user = User(**user_dict)
 
     if get_user(db_session, user.email):
