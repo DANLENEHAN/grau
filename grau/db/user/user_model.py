@@ -3,12 +3,14 @@ from enum import Enum
 from typing import Annotated, Optional
 
 from flask_login import UserMixin
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import (BaseModel, EmailStr, HttpUrl, conint, constr,
+                      relationship, validator)
 from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
+from grau.db.enums import DateFormat, HeightUnits, WeightUnits
 from grau.db.model import Base
-from grau.utils import encrypt_str
+from grau.utils import encrypt_str, validate_enum_member
 
 
 class UserStatus(Enum):
@@ -55,7 +57,7 @@ class User(UserMixin, Base):
     last_name: Mapped[str] = mapped_column(String(100), nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
     phone_number: Mapped[str] = mapped_column(String(50), nullable=True)
-    area_code: Mapped[str] = mapped_column(String(50), nullable=True)
+    area_code: Mapped[str] = mapped_column(String(20), nullable=True)
     height_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     weight_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     date_format_pref: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -79,13 +81,66 @@ class User(UserMixin, Base):
         )
 
 
-class UserSchema(BaseModel):
+class UserValidationSchema(BaseModel):
     """
     Schema for validating user data
     """
 
+    username: Annotated[
+        str,
+        constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9]+$"),
+    ]
     email: EmailStr
     password: Annotated[
         str,
         constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$"),
     ]
+
+    created_at: datetime = datetime.now()
+    updated_at: datetime = datetime.now()
+
+    status: str = UserStatus.ACTIVE.value
+    profile_link: Optional[HttpUrl]
+    premium: bool = False
+
+    age: Annotated[int, conint(ge=0, le=150)]
+    birthday: Annotated[str, constr(min_length=8, max_length=8)]
+    first_name: Annotated[
+        str, constr(min_length=8, max_length=50, regex=r"^[A-Za-z0-9]+$")
+    ]
+    last_name: Annotated[
+        str, constr(min_length=8, max_length=50, regex=r"^[A-Za-z0-9]+$")
+    ]
+    gender: Annotated[str, constr(min_length=4, max_length=6)]
+
+    phone_number: Annotated[int, conint(ge=99999999999999, le=999999999999999)]
+    # https://countrycode.org/
+    area_code: Annotated[str, constr(min_length=2, max_length=10)]
+    height_unit_pref: Annotated[str, constr(min_length=2, max_length=2)]
+    weight_unit_pref: Annotated[str, constr(min_length=3, max_length=2)]
+    date_format_pref: Annotated[str, constr(min_length=8, max_length=11)]
+    language: str
+
+    _validate_birthday = validator("birthday", allow_reuse=True)(
+        lambda birthday: datetime.strptime(birthday, DateFormat.YMD.value)
+    )
+
+    _validate_password = validator("password", allow_reuse=True)(
+        lambda password: encrypt_str(secret_str=password)
+    )
+
+    _validate_height_unit = validator("height_unit_pref", allow_reuse=True)(
+        lambda value: validate_enum_member(enum=HeightUnits, value=value)
+    )
+
+    _validate_weight_unit = validator("weight_unit_pref", allow_reuse=True)(
+        lambda value: validate_enum_member(enum=WeightUnits, value=value)
+    )
+
+    _validate_date_format = validator("date_format_pref", allow_reuse=True)(
+        lambda value: validate_enum_member(enum=DateFormat, value=value)
+    )
+
+    _validate_gender = validator("gender", allow_reuse=True)(
+        lambda value: validate_enum_member(enum=Gender, value=value)
+    )

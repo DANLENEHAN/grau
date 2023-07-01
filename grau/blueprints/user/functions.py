@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Dict, Tuple
 from uuid import uuid4
 
@@ -6,8 +5,8 @@ from flask_login import login_user, logout_user
 from sqlalchemy import and_
 from sqlalchemy.orm import scoped_session
 
-from grau.db.user.user_model import User
-from grau.utils import decrypt_str, encrypt_str
+from grau.db.user.user_model import User, UserValidationSchema
+from grau.utils import decrypt_str
 
 
 def get_user(db_session: scoped_session, email: str) -> User:
@@ -33,18 +32,10 @@ def create_user(
     Returns:
         tuple[str, int]: tuple containing the response message and status code
     """
-    user_dict["password"] = encrypt_str(user_dict["password"])
-    user_dict["created_at"] = datetime.now()
-    user_dict["updated_at"] = datetime.now()
-    user_dict["birthday"] = datetime.strptime(
-        user_dict["birthday"], "%Y-%m-%d"
-    )
-    user = User(**user_dict)
-
+    user = User(**UserValidationSchema(**user_dict).dict())
     if get_user(db_session, user.email):
         return "Email already assoicated with account", 400
 
-    user.status = "active"
     db_session.add(user)
     db_session.commit()
     return "User created successfully", 201
