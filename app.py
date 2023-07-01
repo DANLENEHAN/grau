@@ -14,6 +14,10 @@ from sqlalchemy.orm import sessionmaker
 from grau.blueprints.user.routes import user_api
 from grau.db.functions import get_session_maker
 from grau.db.user.user_model import User
+from grau.exceptions.exception_handlers import handle_grau_exception
+from grau.exceptions.grau_exceptions import (BadRequest, GrauException,
+                                             ResourceAlreadyExists,
+                                             ResourceNotFound)
 from grau.utils import decrypt_str, get_secret_key
 
 
@@ -28,6 +32,7 @@ def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
     app = Flask(__name__)
     app.register_blueprint(user_api)
     add_app_config(app)
+    register_error_handlers(app)
 
     db_session = flask_scoped_session(session_factory, app)
     login_manager = LoginManager()
@@ -94,3 +99,16 @@ def add_app_config(app: Flask) -> None:
     """
     app.config["SECRET_KEY"] = get_secret_key()
     app.config["REMEMBER_COOKIE_DURATION"] = 60 * 60 * 24  # 1 day
+
+
+def register_error_handlers(app: Flask) -> None:
+    """
+    Registers error handlers for the app.
+    """
+    for exception in [
+        GrauException,
+        ResourceNotFound,
+        ResourceAlreadyExists,
+        BadRequest,
+    ]:
+        app.register_error_handler(exception, handle_grau_exception)
