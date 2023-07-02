@@ -89,8 +89,8 @@ class UserValidationSchema(BaseModel):
         constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$"),
     ]
 
-    created_at: DateTime = datetime.now()
-    updated_at: DateTime = datetime.now()
+    created_at: datetime = datetime.now()
+    updated_at: datetime = datetime.now()
 
     status: str = UserStatus.ACTIVE.value
     profile_link: Optional[HttpUrl]
