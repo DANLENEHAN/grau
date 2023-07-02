@@ -1,8 +1,5 @@
 from datetime import datetime
 
-from freezegun import freeze_time
-from freezegun.api import FakeDatetime
-
 from grau.db.user.user_model import User, UserValidationSchema
 from grau.utils import decrypt_str
 
@@ -31,7 +28,6 @@ class TestUserModel:
         "weight_unit_pref": "kg",
     }
 
-    @freeze_time("2023-01-01 12:00:00")
     def test_validate_valid_user(self, db_session):
         """
         Tests the user validation schema with a valid user
@@ -58,6 +54,7 @@ class TestUserModel:
         assert user.birthday == datetime(1997, 5, 18, 0, 0)
         assert user.status == "active"
 
-        assert user.created_at == FakeDatetime(2023, 6, 27, 17, 4, 42, 139677)
-        assert user.updated_at == FakeDatetime(2023, 6, 27, 17, 4, 42, 139677)
+        assert isinstance(user.created_at, datetime)
+        assert isinstance(user.updated_at, datetime)
+        assert user.created_at == user.updated_at
         assert (user.session_id and user.profile_link) is None

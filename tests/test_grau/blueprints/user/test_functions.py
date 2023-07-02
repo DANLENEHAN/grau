@@ -26,21 +26,16 @@ class TestUserSessionIntegration:
         "weight_unit_pref": "kg",
     }
 
-    def test_insert_user(self, module_client):
+    def test_user_session_management(self, client):
         """
-        Tests the create_user function in grau/blueprints/user/functions.py
+        Tests the user session management capabilities
         """
 
-        response = module_client.post("/create_user", json=self.user_object)
+        response = client.post("/create_user", json=self.user_object)
         assert response.status_code == 201
         assert response.data == b"User created successfully"
 
-    def test_login_user(self, module_client):
-        """
-        Tests the login endpoint in grau/blueprints/user/functions.py
-        This test is dependent on test_insert_user
-        """
-        response = module_client.post(
+        response = client.post(
             "/login",
             json={
                 "email": self.user_object["email"],
@@ -50,32 +45,13 @@ class TestUserSessionIntegration:
         assert response.status_code == 200
         assert response.data == b"Login successful"
 
-    def test_user_auth(self, module_client):
-        """
-        Tests the user_authenticated endpoint in
-        grau/blueprints/user/functions.py This test
-        is dependent on test_insert_user
-        """
-        response = module_client.get("/user_authenticated")
+        response = client.get("/user_authenticated")
         assert response.status_code == 200
         assert response.data == b"User Authenticated"
 
-    def test_logout_user(self, module_client):
-        """
-        Tests the logout endpoint in grau/blueprints/user/functions.py
-        This test is dependent on test_insert_user
-        """
-        response = module_client.post(
-            "/logout", json={"session_id": "testing123"}
-        )
+        response = client.post("/logout", json={"session_id": "testing123"})
         assert response.status_code == 200
         assert response.data == b"Logout successful"
 
-    def test_user_auth_logged_out_user(self, module_client):
-        """
-        Tests the user_authenticated endpoint in
-        grau/blueprints/user/functions.py This test
-        is dependent on test_insert_user
-        """
-        response = module_client.get("/user_authenticated")
+        response = client.get("/user_authenticated")
         assert response.status_code == 401
