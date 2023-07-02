@@ -5,6 +5,10 @@ and session handling capabilities
 
 
 class TestUserSessionIntegration:
+    """
+    Tests the user session handling capabilities
+    """
+
     user_object = {
         "age": 25,
         "area_code": "353",
@@ -48,8 +52,9 @@ class TestUserSessionIntegration:
 
     def test_user_auth(self, module_client):
         """
-        Tests the user_authenticated endpoint in grau/blueprints/user/functions.py
-        This test is dependent on test_insert_user
+        Tests the user_authenticated endpoint in
+        grau/blueprints/user/functions.py This test
+        is dependent on test_insert_user
         """
         response = module_client.get("/user_authenticated")
         assert response.status_code == 200
@@ -68,8 +73,9 @@ class TestUserSessionIntegration:
 
     def test_user_auth_logged_out_user(self, module_client):
         """
-        Tests the user_authenticated endpoint in grau/blueprints/user/functions.py
-        This test is dependent on test_insert_user
+        Tests the user_authenticated endpoint in
+        grau/blueprints/user/functions.py This test
+        is dependent on test_insert_user
         """
         response = module_client.get("/user_authenticated")
         assert response.status_code == 401

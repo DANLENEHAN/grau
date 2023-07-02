@@ -1,16 +1,19 @@
 from werkzeug.exceptions import HTTPException
 
+from grau.db.enums import StatusCode
+
 
 class GrauException(HTTPException):
     """Base class for all exceptions raised by Grau."""
 
-    code = 500
+    code = StatusCode.INTERNAL_SERVER_ERROR.value
     description = "An error occurred."
 
     def __init__(self, message=None, data=None, response=None):
         """Initializes the exception."""
         self.message = message
         self.data = data
+        super().__init__(self.description, response)
 
     def to_dict(self):
         """Returns a dictionary representation of the exception."""
@@ -23,14 +26,11 @@ class GrauException(HTTPException):
         """Returns the string representation of the exception."""
         return self.message
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-
 
 class ResourceNotFound(GrauException):
     """Exception raised when a resource is not found."""
 
-    code = 404
+    code = StatusCode.NOT_FOUND.value
     description = "Resource not found."
 
     def __init__(self, message=None, data=None):
@@ -41,7 +41,7 @@ class ResourceNotFound(GrauException):
 class ResourceAlreadyExists(GrauException):
     """Exception raised when a resource already exists."""
 
-    code = 409
+    code = StatusCode.CONFLICT.value
     description = "Resource already exists."
 
     def __init__(self, message=None, data=None):
@@ -52,7 +52,7 @@ class ResourceAlreadyExists(GrauException):
 class BadRequest(GrauException):
     """Exception raised when a bad request is made."""
 
-    code = 400
+    code = StatusCode.BAD_REQUEST.value
     description = "Bad request."
 
     def __init__(self, message=None, data=None):

@@ -7,7 +7,7 @@ from sqlalchemy.orm import scoped_session
 
 from grau.db.user.user_model import User, UserValidationSchema
 from grau.exceptions.grau_exceptions import ResourceAlreadyExists
-from grau.utils import decrypt_str, encrypt_str
+from grau.utils import decrypt_str
 
 
 def get_user(db_session: scoped_session, email: str) -> User:

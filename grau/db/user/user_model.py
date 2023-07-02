@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Annotated, Optional
 
@@ -89,10 +89,10 @@ class UserValidationSchema(BaseModel):
         constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$"),
     ]
 
-    created_at: timedelta = datetime.now()
-    updated_at: timedelta = datetime.now()
+    created_at: DateTime = datetime.now()
+    updated_at: DateTime = datetime.now()
 
-    status: UserStatus = UserStatus.ACTIVE.value
+    status: str = UserStatus.ACTIVE.value
     profile_link: Optional[HttpUrl]
     premium: bool = False
 
