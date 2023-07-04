@@ -3,10 +3,9 @@ from enum import Enum
 from typing import Annotated, Optional
 
 from flask_login import UserMixin
-from pydantic import (BaseModel, EmailStr, HttpUrl, conint, constr,
-                      relationship, validator)
+from pydantic import BaseModel, EmailStr, HttpUrl, conint, constr, validator
 from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from grau.db.enums import DateFormat, HeightUnits, WeightUnits
 from grau.db.model import Base

@@ -2,7 +2,7 @@ import datetime as dt
 from typing import Dict
 from unittest.mock import ANY, MagicMock, patch
 
-from grau.utils import decrypt_str
+from freezegun import freeze_time
 
 
 class UserFactory:
@@ -22,11 +22,11 @@ class UserFactory:
         user = {
             "id": user_id,
             "username": "test_user",
-            "email": "test_email",
+            "email": "test_email@emial.com",
             "password": "test_password",
             "session_id": "test_session_id",
             "status": "active",
-            "profile_link": "test_profile_link",
+            "profile_link": "https://wwww.test.com",
             "premium": False,
             "age": 21,
             "birthday": dt.date(2000, 1, 1).strftime("%Y-%m-%d"),
@@ -37,7 +37,7 @@ class UserFactory:
             "area_code": "123",
             "height_unit_pref": "cm",
             "weight_unit_pref": "lbs",
-            "date_format_pref": "YYYY-MM-DD",
+            "date_format_pref": "%Y-%m-%d",
             "language": "en",
         }
         user.update(kwargs)
@@ -81,7 +81,7 @@ class TestRoutes:
     def test_create_user_stats(
         self,
         mock_create_user_stats: MagicMock,
-        client,
+        function_client,
         insert_user,
         login_user,
     ):
@@ -89,17 +89,17 @@ class TestRoutes:
         Test create_user_stats route.
         """
         # Given
-        test_user = self.user_factory.get_user()
+        test_user_a = self.user_factory.get_user(id=13)
         test_user_stat = self.user_stat_factory.get_user_stats(
-            user_id=test_user["id"]
+            user_id=test_user_a["id"]
         )
-        user = insert_user(test_user)
+        user = insert_user(test_user_a)
         login_user(user)
 
         # When
-        client.post(
-            "/create_user_stats",
-            json={"user_stats_dict": test_user_stat.copy()},
+        function_client.post(
+            "/create_user_stat",
+            json={"user_stat_dict": test_user_stat.copy()},
             follow_redirects=True,
         )
         # Then
@@ -107,7 +107,7 @@ class TestRoutes:
             db_session=ANY, user_stats_dict=test_user_stat
         )
 
-    def test_create_user_stats_no_login(self, client):
+    def test_create_user_stats_no_login(self, function_client):
         """
         Test create_user_stats route.
         """
@@ -118,8 +118,8 @@ class TestRoutes:
         )
 
         # When
-        response = client.post(
-            "/create_user_stats",
+        response = function_client.post(
+            "/create_user_stat",
             json={"user_stats_dict": test_user_stat.copy()},
             follow_redirects=True,
         )
@@ -130,22 +130,25 @@ class TestRoutes:
         )
 
     @patch("grau.blueprints.user_stats.routes.functions.delete_user_stat")
-    def test_delete_user_stats(
+    def test_delete_user_stats(  # noqa pylint: disable=R0913
         self,
         mock_delete_user_stat: MagicMock,
-        client,
+        function_client,
         insert_user,
         login_user,
         insert_user_stat,
     ):
+        """
+        Test delete_user_stats route.
+        """
         # Given
-        test_user = insert_user(self.user_factory.get_user())
+        test_user = insert_user(self.user_factory.get_user(id=17))
         test_user_stat = insert_user_stat(
             self.user_stat_factory.get_user_stats(user_id=test_user["id"])
         )
         login_user(test_user)
         # When
-        client.delete(
+        function_client.delete(
             "/delete_user_stat",
             json={"user_stats_dict": test_user_stat.copy()},
         )
@@ -160,14 +163,18 @@ class TestRoutes:
         "grau.blueprints.user_stats.routes.functions.update_user_stat",
         side_effect=lambda db_session, user_stats_dict: user_stats_dict,
     )
-    def test_update_user_stat(
+    @freeze_time("2021-01-01")
+    def test_update_user_stat(  # noqa pylint: disable=R0913
         self,
         mock_update_user_stat: MagicMock,
-        client,
+        function_client,
         insert_user,
         login_user,
         insert_user_stat,
     ):
+        """
+        Test update_user_stat route.
+        """
         # Given
         test_user = insert_user(self.user_factory.get_user())
         test_user_stat = insert_user_stat(
@@ -180,27 +187,48 @@ class TestRoutes:
         updated_user_stat["unit"] = "lbs"
 
         # When
-        result = client.put(
+
+        function_client.put(
             "/update_user_stat",
             json={"user_stats_dict": updated_user_stat.copy()},
         )
         # Then
-        for field in updated_user_stat:
-            if field not in ["created_at", "updated_at"]:
-                assert result.json[field] == updated_user_stat[field]
+        expected_user_stat = updated_user_stat.copy()
+        # TODO: This is a hack to get around the fact that the datetime
+        # is beign converted to a string by the json encoder
+        expected_user_stat["created_at"] = expected_user_stat[
+            "created_at"
+        ].strftime("%a, %d %b %Y %H:%M:%S GMT")
+        expected_user_stat["updated_at"] = expected_user_stat[
+            "updated_at"
+        ].strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+        mock_update_user_stat.assert_called_once_with(
+            db_session=ANY,
+            user_stats_dict=expected_user_stat,
+        )
 
     @patch("grau.blueprints.user_stats.routes.functions.get_user_stats")
     def test_get_user_stats(
         self,
         mock_get_user_stats: MagicMock,
-        client,
         insert_user,
         login_user,
-        insert_user_stat,
+        function_client,
     ):
+        """
+        Test get_user_stats route.
+        """
         # Given
         test_user = insert_user(self.user_factory.get_user())
         login_user(test_user)
 
         # When
-        mock_get_user_stats(db_session=ANY, user_id=test_user["id"])
+        function_client.get(
+            "/get_user_stats", json={"user_id": test_user["id"]}
+        )
+
+        # Then
+        mock_get_user_stats.assert_called_once_with(
+            db_session=ANY, user_id=test_user["id"]
+        )

@@ -7,16 +7,16 @@ from grau.blueprints.user_stats import functions
 user_stats_api = Blueprint("user_stats_api", __name__)
 
 
-@user_stats_api.route("/create_user_stats", methods=["POST"])
+@user_stats_api.route("/create_user_stat", methods=["POST"])
 @login_required
-def create_user_stats():
+def create_user_stat():
     """
-    Create user_stats endpoint for user_stats.
+    Create user_stat endpoint for user_stats.
 
     Expects:
         user_stats_dict: dict of user_stats data to create
     """
-    stats_content = request.json["user_stats_dict"]
+    stats_content = request.json["user_stat_dict"]
 
     return functions.create_user_stats(
         db_session=current_session, user_stats_dict=stats_content
