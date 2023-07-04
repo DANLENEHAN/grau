@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "DateFormat": {
+      "description": "Accepted date formats.",
+      "enum": [
+        "%Y-%m-%d",
+        "%m-%d-%Y",
+        "%d-%m-%Y"
+      ],
+      "title": "DateFormat",
+      "type": "string"
+    },
+    "Gender": {
+      "description": "Enum for user gender",
+      "enum": [
+        "male",
+        "female"
+      ],
+      "title": "Gender",
+      "type": "string"
+    },
+    "HeightUnits": {
+      "description": "Height units.",
+      "enum": [
+        "cm",
+        "inch",
+        "feet"
+      ],
+      "title": "HeightUnits",
+      "type": "string"
+    },
+    "UserStatus": {
+      "description": "Enum for user status",
+      "enum": [
+        "active",
+        "inactive",
+        "deleted",
+        "banned"
+      ],
+      "title": "UserStatus",
+      "type": "string"
+    },
+    "WeightUnits": {
+      "description": "Weight units.",
+      "enum": [
+        "lbs",
+        "kg",
+        "stone"
+      ],
+      "title": "WeightUnits",
+      "type": "string"
+    }
+  },
+  "description": "\n    Schema for validating user data\n    ",
+  "properties": {
+    "username": {
+      "maxLength": 100,
+      "minLength": 8,
+      "pattern": "^[A-Za-z0-9]+$",
+      "title": "Username",
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+    },
+    "password": {
+      "maxLength": 100,
+      "minLength": 8,
+      "pattern": "^[A-Za-z0-9@#$%^&+=]+$",
+      "title": "Password",
+      "type": "string"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/UserStatus"
+        }
+      ],
+      "default": "active"
+    },
+    "profile_link": {
+      "anyOf": [
+        {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Link"
+    },
+    "premium": {
+      "default": false,
+      "title": "Premium",
+      "type": "boolean"
+    },
+    "age": {
+      "maximum": 150,
+      "minimum": 0,
+      "title": "Age",
+      "type": "integer"
+    },
+    "birthday": {
+      "maxLength": 10,
+      "minLength": 10,
+      "title": "Birthday",
+      "type": "string"
+    },
+    "first_name": {
+      "maxLength": 50,
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9]+$",
+      "title": "First Name",
+      "type": "string"
+    },
+    "last_name": {
+      "maxLength": 50,
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9]+$",
+      "title": "Last Name",
+      "type": "string"
+    },
+    "gender": {
+      "$ref": "#/$defs/Gender"
+    },
+    "phone_number": {
+      "maxLength": 64,
+      "minLength": 7,
+      "title": "Phone Number",
+      "type": "string"
+    },
+    "area_code": {
+      "maxLength": 10,
+      "minLength": 2,
+      "title": "Area Code",
+      "type": "string"
+    },
+    "height_unit_pref": {
+      "$ref": "#/$defs/HeightUnits"
+    },
+    "weight_unit_pref": {
+      "$ref": "#/$defs/WeightUnits"
+    },
+    "date_format_pref": {
+      "$ref": "#/$defs/DateFormat"
+    },
+    "language": {
+      "title": "Language",
+      "type": "string"
+    }
+  },
+  "required": [
+    "username",
+    "email",
+    "password",
+    "age",
+    "birthday",
+    "first_name",
+    "last_name",
+    "gender",
+    "phone_number",
+    "area_code",
+    "height_unit_pref",
+    "weight_unit_pref",
+    "date_format_pref",
+    "language"
+  ],
+  "title": "UserValidationSchema",
+  "type": "object"
+}

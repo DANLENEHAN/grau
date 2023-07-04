@@ -22,7 +22,7 @@ class TestUserModel:
         "language": "english",
         "last_name": "lenehan",
         "password": "testing123",
-        "phone_number": "6307731531",
+        "phone_number": "+447308831531",
         "premium": True,
         "username": "danlen97",
         "weight_unit_pref": "kg",
@@ -44,7 +44,7 @@ class TestUserModel:
 
         # static fields: should be the same as the original
         for attribute, value in self.user_object.items():
-            if attribute not in ["password", "birthday"]:
+            if attribute not in ["password", "birthday", "phone_number"]:
                 assert getattr(user, attribute) == value
 
         # API defined or transformed fields: different
@@ -53,6 +53,7 @@ class TestUserModel:
         assert decrypt_str(user.password) == self.user_object["password"]
         assert user.birthday == datetime(1997, 5, 18, 0, 0)
         assert user.status == "active"
+        assert user.phone_number == "tel:+44-7308-831531"
 
         assert isinstance(user.created_at, datetime)
         assert isinstance(user.updated_at, datetime)

@@ -21,7 +21,8 @@ class TestUserSessionIntegration:
         "language": "english",
         "last_name": "lenehan",
         "password": "testing123",
-        "phone_number": "6307731531",
+        "phone_number": "+447308831531",
+        "premium": True,
         "username": "danlen97",
         "weight_unit_pref": "kg",
     }
