@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 from cryptography.fernet import Fernet
 
@@ -32,7 +32,11 @@ def decrypt_str(secret_str: str, secret_key: Optional[str] = None) -> str:
     return f.decrypt(secret_str.encode()).decode()
 
 
-def validate_enum_member(enum: Enum, value: any) -> bool:
+def validate_enum_member(enum: type[Enum], value: Any) -> bool:
+    """
+    Validate that a value belongs to an Enum class.
+    """
+
     if value in [m.value for m in enum.__members__.values()]:
         return value
     raise ValueError(

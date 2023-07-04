@@ -32,9 +32,13 @@ import app as flask_app
 from grau.db.model import Base
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_settings_env_vars():
-    """There's no reason for this salt to change"""
+    """
+    There's no reason for this salt to change
+    There must be a class level var for
+    the test classes to pick up the fixture
+    """
     with patch.dict(
         os.environ,
         {"APP_SECRET": "WDoxnMneVvbkb-VMAVNSDHDvEZjfjzrlPpLVQdYTQd0="},
@@ -42,55 +46,11 @@ def mock_settings_env_vars():
         yield
 
 
-@pytest.fixture(scope="module")
-def module_session_factory():
-    """
-    The fixture is configured with scope="module", which means that the connection
-    will be established once per test session and shared among all the tests.
-
-    The `yield` statement separates the setup and teardown code.
-    After yielding the connection, pytest executes the teardown code,
-    which closes the connection and cleans up the database.
-    """
-    # Establish a connection to an in-memory SQLite database
-    engine = create_engine("sqlite://")
-    Base.metadata.create_all(engine)
-
-    session_factory = sessionmaker(bind=engine)
-
-    yield session_factory
-
-    # Teardown: Close the connection and clean up the database
-    Base.metadata.drop_all(engine)
-    engine.dispose()
-
-
-@pytest.fixture(scope="module")
-def module_db_session(module_session_factory):
-    Session = scoped_session(module_session_factory)
-
-    yield Session
-
-    Session.remove()
-
-
-@pytest.fixture(scope="module")
-def module_app(module_db_session):
-    app = flask_app.create_app(session_factory=module_db_session)
-
-    yield app
-
-
-@pytest.fixture(scope="module")
-def module_client(module_app):
-    return module_app.test_client()
-
-
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def session_factory():
     """
     The fixture is configured with scope="function", which means that the connection
-    will be established once per test session and shared among all the tests.
+    will be established once per test.
 
     The `yield` statement separates the setup and teardown code.
     After yielding the connection, pytest executes the teardown code,
@@ -109,7 +69,7 @@ def session_factory():
     engine.dispose()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def db_session(session_factory):
     Session = scoped_session(session_factory)
 
@@ -118,13 +78,13 @@ def db_session(session_factory):
     Session.remove()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def app(session_factory):
     app = flask_app.create_app(session_factory=session_factory)
 
     yield app
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def client(app):
     return app.test_client()

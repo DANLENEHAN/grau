@@ -8,7 +8,7 @@
         "-s",
         ".",
         "-p",
-        "*test.py"
+        "test_*.py"
     ],
     "python.testing.unittestEnabled": false,
     "sqltools.connections": [

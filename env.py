@@ -5,7 +5,7 @@ import time
 from grau.db.functions import get_db_engine
 
 # Get the database URL from the environment variable
-db_url = os.environ.get("DATABASE_URL")
+db_url = os.getenv("DATABASE_URL")
 
 # Load the alembic.ini file
 config = configparser.ConfigParser()
