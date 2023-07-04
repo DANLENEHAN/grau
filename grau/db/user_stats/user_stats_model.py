@@ -24,9 +24,4 @@ class UserStats(Base):
     user = relationship("User", back_populates="user_stats")
 
     def __repr__(self) -> str:
-        return (
-            f"UserStats(id={self.id!r},"
-            "value={self.value!r}, unit={self.unit!r},"
-            "created_at={self.created_at!r},"
-            "updated_at={self.updated_at!r}, note={self.note!r})"
-        )
+        return f"UserStats(id={self.id!r}, user_id={self.user_id!r})"

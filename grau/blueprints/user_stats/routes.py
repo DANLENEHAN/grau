@@ -45,7 +45,7 @@ def get_user_stat():
     stats_content = request.json["user_stats_dict"]
     return functions.get_user_stat(
         db_session=current_session,
-        user_id=session.get("_user_id"),
+        user_id=stats_content["user_id"],
         stat_id=stats_content["id"],
     )
 
