@@ -1,4 +1,4 @@
-from flask import Blueprint, request, session
+from flask import Blueprint, request
 from flask_login import login_required
 from flask_sqlalchemy_session import current_session
 

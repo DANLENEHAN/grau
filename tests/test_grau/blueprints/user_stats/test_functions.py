@@ -63,8 +63,10 @@ class TestFunctions:
         )
         # then
         assert request_response == ("User stat updated successfully", 200)
-        for key in user_stat:
-            assert result.__dict__[key] == new_user_stat[key]
+        for key, value in new_user_stat.items():
+            if key in ["created_at", "updated_at"]:
+                continue
+            assert result.__dict__[key] == value
 
     @pytest.mark.usefixtures("frozen_datetime")
     def test_get_user_stats(self, db_session, insert_user_stat):

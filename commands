@@ -58,6 +58,9 @@ docker compose --file ./docker/docker-compose.yaml up -d
 # up and down the stack
 docker compose --file ./docker/docker-compose.yaml down; docker compose --file ./docker/docker-compose.yaml up -d
 
+# Whipe all docker volumes
+docker compose --file ./docker/docker-compose.yaml down; docker volume prune; docker compose --file ./docker/docker-compose.yaml up -d
+
 # Debugging/Container Access
 # docker exec -it CONTAINER_ID (only has to be first 3 chars)
 # allows you to execute commands in a container

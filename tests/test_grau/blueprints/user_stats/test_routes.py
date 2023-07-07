@@ -10,7 +10,7 @@ class UserFactory:
     Factory for creating users.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_id: int = 1
 
     def get_user(self, **kwargs) -> Dict:
@@ -187,7 +187,6 @@ class TestRoutes:
         updated_user_stat["unit"] = "lbs"
 
         # When
-
         client.put(
             "/update_user_stat",
             json={"user_stats_dict": updated_user_stat.copy()},
