@@ -25,11 +25,17 @@ import os
 from unittest.mock import patch
 
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import app as flask_app
+from grau.blueprints.user.functions import create_user
+from grau.blueprints.user_stats.functions import create_user_stats
 from grau.db.model import Base
+from grau.db.user.user_model import User
+from grau.db.user_stats.user_stats_model import UserStats
+from grau.utils import decrypt_str
 
 
 @pytest.fixture(autouse=True)
@@ -81,8 +87,78 @@ def db_session(session_factory):
 @pytest.fixture()
 def app(session_factory):
     app = flask_app.create_app(session_factory=session_factory)
-
     yield app
+
+
+@pytest.fixture()
+def insert_user_stat(db_session):
+    """
+    This is a fixture that can be used to insert a user stat into the database. It's a function that can be called to insert a user stat
+    Scope: function - This means that the client will be created once per test function
+    """
+
+    def _insert_user_stat(user_stat):
+        _, response_code = create_user_stats(db_session, user_stat)
+        if response_code != 201:
+            raise Exception(f"Failed to insert user: {user_stat}")
+        return user_stat
+
+    yield _insert_user_stat
+    # Teardown: Erase all DB data after each test
+    db_session.query(UserStats).delete()
+    db_session.commit()
+
+
+@pytest.fixture()
+def insert_user(db_session):
+    """
+    This is a fixture that can be used to insert a user into the database. It's a function that can be called to insert a user
+    Scope: function - This means that the client will be created once per test function
+    """
+
+    def _insert_user(user):
+        """
+        This is a function that can be called to insert a user
+        """
+        _, response_code = create_user(db_session, user)
+        if response_code != 201:
+            raise Exception(f"Failed to insert user: {user}")
+        return user
+
+    yield _insert_user
+    # Teardown: Erase all DB data after each test
+    db_session.query(User).delete()
+    db_session.commit()
+
+
+@pytest.fixture()
+def frozen_datetime():
+    with freeze_time("2023-01-01"):
+        yield
+
+
+@pytest.fixture()
+def login_user(client):
+    """
+    This is a fixture that can be used to login a user. It's a function that can be called to login a user
+    Scope: function - This means that the client will be created once per test function
+    """
+
+    def _login_user(user):
+        """
+        This is a function that can be called to login a user
+        """
+        response = client.post(
+            "/login",
+            json={
+                "email": user["email"],
+                "password": user["password"],
+            },
+        )
+        if response.status_code != 200:
+            raise Exception(f"Login failed: {response.status_code}")
+
+    return _login_user
 
 
 @pytest.fixture()

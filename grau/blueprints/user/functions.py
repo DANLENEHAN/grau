@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 from uuid import uuid4
 
 from flask_login import login_user, logout_user
@@ -23,7 +23,7 @@ def get_user(db_session: scoped_session, email: str) -> User:
 
 
 def create_user(
-    db_session: scoped_session, user_dict: Dict[str, str]
+    db_session: scoped_session, user_dict: Dict[str, Any]
 ) -> Tuple[str, int]:
     """
     Function to create a user in the database

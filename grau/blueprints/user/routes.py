@@ -13,6 +13,7 @@ def create_user():
     """
     Create user endpoint for users.
     """
+
     return functions.create_user(current_session, request.json)
 
 

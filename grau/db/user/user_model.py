@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Optional
 
 from flask_login import UserMixin
 from pydantic import BaseModel, EmailStr, HttpUrl, conint, constr, validator
-from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import TIMESTAMP, Boolean, Date, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from grau.db.enums import DateFormat, HeightUnits, WeightUnits
 from grau.db.model import Base
@@ -44,10 +44,11 @@ class User(UserMixin, Base):
     password: Mapped[str] = mapped_column(String(100))
 
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.now()  # pylint: disable=E1102
+        TIMESTAMP(timezone=True),
+        server_default=func.now(),  # pylint: disable=E1102
     )
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP,
+        TIMESTAMP(timezone=True),
         server_default=func.now(),  # pylint: disable=E1102
         onupdate=func.now(),  # pylint: disable=E1102
     )
@@ -57,7 +58,7 @@ class User(UserMixin, Base):
     premium: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    birthday: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    birthday: Mapped[date] = mapped_column(Date, nullable=True)
     first_name: Mapped[str] = mapped_column(String(100), nullable=True)
     last_name: Mapped[str] = mapped_column(String(100), nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -67,6 +68,8 @@ class User(UserMixin, Base):
     weight_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     date_format_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     language: Mapped[str] = mapped_column(String(50), nullable=True)
+
+    user_stats = relationship("UserStats", back_populates="user")
 
     def get_id(self) -> str:
         """_summary_
@@ -118,7 +121,9 @@ class UserValidationSchema(BaseModel):
     language: str
 
     _validate_birthday = validator("birthday", allow_reuse=True)(
-        lambda birthday: datetime.strptime(birthday, DateFormat.YMD.value)
+        lambda birthday: datetime.strptime(
+            birthday, DateFormat.YMD.value
+        ).date()
     )
 
     _validate_password = validator("password", allow_reuse=True)(
