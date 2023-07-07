@@ -38,9 +38,13 @@ from grau.db.user_stats.user_stats_model import UserStats
 from grau.utils import decrypt_str
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_settings_env_vars():
-    """There's no reason for this salt to change"""
+    """
+    There's no reason for this salt to change
+    There must be a class level var for
+    the test classes to pick up the fixture
+    """
     with patch.dict(
         os.environ,
         {"APP_SECRET": "WDoxnMneVvbkb-VMAVNSDHDvEZjfjzrlPpLVQdYTQd0="},
@@ -48,59 +52,11 @@ def mock_settings_env_vars():
         yield
 
 
-@pytest.fixture(scope="function")
-def function_session_factory():
-    """
-    The fixture is configured with scope="module", which means that the connection
-    will be established once per test session and shared among all the tests.
-
-    The `yield` statement separates the setup and teardown code.
-    After yielding the connection, pytest executes the teardown code,
-    which closes the connection and cleans up the database.
-    """
-    # Establish a connection to an in-memory SQLite database
-    engine = create_engine("sqlite://")
-    Base.metadata.create_all(engine)
-
-    session_factory = sessionmaker(bind=engine)
-
-    yield session_factory
-
-    # Teardown: Close the connection and clean up the database
-    Base.metadata.drop_all(engine)
-    engine.dispose()
-
-
-@pytest.fixture(scope="function")
-def function_db_session(function_session_factory):
-    Session = scoped_session(function_session_factory)
-
-    yield Session
-
-    Session.remove()
-
-
-@pytest.fixture(scope="function")
-def function_app(function_session_factory):
-    app = flask_app.create_app(session_factory=function_session_factory)
-
-    yield app
-
-
-@pytest.fixture(scope="function")
-def function_client(function_app):
-    """
-    This is a fixture that can be used to test the api. It's a client that can be used to make requests to the api
-    Scope: function - This means that the client will be created once per test function
-    """
-    return function_app.test_client()
-
-
-@pytest.fixture(scope="class")
-def class_session_factory():
+@pytest.fixture()
+def session_factory():
     """
     The fixture is configured with scope="function", which means that the connection
-    will be established once per test session and shared among all the tests.
+    will be established once per test.
 
     The `yield` statement separates the setup and teardown code.
     After yielding the connection, pytest executes the teardown code,
@@ -119,48 +75,42 @@ def class_session_factory():
     engine.dispose()
 
 
-@pytest.fixture(scope="class")
-def class_db_session(class_session_factory):
-    Session = scoped_session(class_session_factory)
+@pytest.fixture()
+def db_session(session_factory):
+    Session = scoped_session(session_factory)
 
     yield Session
 
     Session.remove()
 
 
-@pytest.fixture(scope="class")
-def class_app(class_session_factory):
-    app = flask_app.create_app(session_factory=class_session_factory)
-
+@pytest.fixture()
+def app(session_factory):
+    app = flask_app.create_app(session_factory=session_factory)
     yield app
 
 
-@pytest.fixture(scope="class")
-def class_client(class_app):
-    return class_app.test_client()
-
-
-@pytest.fixture(scope="function")
-def insert_user_stat(function_db_session):
+@pytest.fixture()
+def insert_user_stat(db_session):
     """
     This is a fixture that can be used to insert a user stat into the database. It's a function that can be called to insert a user stat
     Scope: function - This means that the client will be created once per test function
     """
 
     def _insert_user_stat(user_stat):
-        _, response_code = create_user_stats(function_db_session, user_stat)
+        _, response_code = create_user_stats(db_session, user_stat)
         if response_code != 201:
             raise Exception(f"Failed to insert user: {user_stat}")
         return user_stat
 
     yield _insert_user_stat
     # Teardown: Erase all DB data after each test
-    function_db_session.query(UserStats).delete()
-    function_db_session.commit()
+    db_session.query(UserStats).delete()
+    db_session.commit()
 
 
-@pytest.fixture(scope="function")
-def insert_user(function_db_session):
+@pytest.fixture()
+def insert_user(db_session):
     """
     This is a fixture that can be used to insert a user into the database. It's a function that can be called to insert a user
     Scope: function - This means that the client will be created once per test function
@@ -170,15 +120,15 @@ def insert_user(function_db_session):
         """
         This is a function that can be called to insert a user
         """
-        _, response_code = create_user(function_db_session, user)
+        _, response_code = create_user(db_session, user)
         if response_code != 201:
             raise Exception(f"Failed to insert user: {user}")
         return user
 
     yield _insert_user
     # Teardown: Erase all DB data after each test
-    function_db_session.query(User).delete()
-    function_db_session.commit()
+    db_session.query(User).delete()
+    db_session.commit()
 
 
 @pytest.fixture()
@@ -187,8 +137,8 @@ def frozen_datetime():
         yield
 
 
-@pytest.fixture(scope="function")
-def login_user(function_client):
+@pytest.fixture()
+def login_user(client):
     """
     This is a fixture that can be used to login a user. It's a function that can be called to login a user
     Scope: function - This means that the client will be created once per test function
@@ -198,7 +148,7 @@ def login_user(function_client):
         """
         This is a function that can be called to login a user
         """
-        response = function_client.post(
+        response = client.post(
             "/login",
             json={
                 "email": user["email"],
@@ -209,3 +159,8 @@ def login_user(function_client):
             raise Exception(f"Login failed: {response.status_code}")
 
     return _login_user
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()

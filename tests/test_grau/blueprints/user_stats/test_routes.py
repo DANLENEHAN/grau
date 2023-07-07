@@ -81,7 +81,7 @@ class TestRoutes:
     def test_create_user_stats(
         self,
         mock_create_user_stats: MagicMock,
-        function_client,
+        client,
         insert_user,
         login_user,
     ):
@@ -97,7 +97,7 @@ class TestRoutes:
         login_user(user)
 
         # When
-        function_client.post(
+        client.post(
             "/create_user_stat",
             json={"user_stat_dict": test_user_stat.copy()},
             follow_redirects=True,
@@ -107,7 +107,7 @@ class TestRoutes:
             db_session=ANY, user_stats_dict=test_user_stat
         )
 
-    def test_create_user_stats_no_login(self, function_client):
+    def test_create_user_stats_no_login(self, client):
         """
         Test create_user_stats route.
         """
@@ -118,7 +118,7 @@ class TestRoutes:
         )
 
         # When
-        response = function_client.post(
+        response = client.post(
             "/create_user_stat",
             json={"user_stats_dict": test_user_stat.copy()},
             follow_redirects=True,
@@ -133,7 +133,7 @@ class TestRoutes:
     def test_delete_user_stats(  # noqa pylint: disable=R0913
         self,
         mock_delete_user_stat: MagicMock,
-        function_client,
+        client,
         insert_user,
         login_user,
         insert_user_stat,
@@ -148,7 +148,7 @@ class TestRoutes:
         )
         login_user(test_user)
         # When
-        function_client.delete(
+        client.delete(
             "/delete_user_stat",
             json={"user_stats_dict": test_user_stat.copy()},
         )
@@ -167,7 +167,7 @@ class TestRoutes:
     def test_update_user_stat(  # noqa pylint: disable=R0913
         self,
         mock_update_user_stat: MagicMock,
-        function_client,
+        client,
         insert_user,
         login_user,
         insert_user_stat,
@@ -188,7 +188,7 @@ class TestRoutes:
 
         # When
 
-        function_client.put(
+        client.put(
             "/update_user_stat",
             json={"user_stats_dict": updated_user_stat.copy()},
         )
@@ -214,7 +214,7 @@ class TestRoutes:
         mock_get_user_stats: MagicMock,
         insert_user,
         login_user,
-        function_client,
+        client,
     ):
         """
         Test get_user_stats route.
@@ -224,9 +224,7 @@ class TestRoutes:
         login_user(test_user)
 
         # When
-        function_client.get(
-            "/get_user_stats", json={"user_id": test_user["id"]}
-        )
+        client.get("/get_user_stats", json={"user_id": test_user["id"]})
 
         # Then
         mock_get_user_stats.assert_called_once_with(

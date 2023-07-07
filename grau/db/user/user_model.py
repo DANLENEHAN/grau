@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 
 from flask_login import UserMixin
 from pydantic import BaseModel, EmailStr, HttpUrl, conint, constr, validator
-from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String
+from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from grau.db.enums import DateFormat, HeightUnits, WeightUnits
@@ -43,8 +43,14 @@ class User(UserMixin, Base):
     email: Mapped[str] = mapped_column(String(50), unique=True)
     password: Mapped[str] = mapped_column(String(100))
 
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=func.now()  # pylint: disable=E1102
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP,
+        server_default=func.now(),  # pylint: disable=E1102
+        onupdate=func.now(),  # pylint: disable=E1102
+    )
     session_id: Mapped[str] = mapped_column(String(150), nullable=True)
     status: Mapped[str] = mapped_column(String(50), nullable=True)
     profile_link: Mapped[str] = mapped_column(String(100), nullable=True)
@@ -73,11 +79,7 @@ class User(UserMixin, Base):
         return encrypt_str(str(self.session_id))
 
     def __repr__(self) -> str:
-        return (
-            f"User(id={self.id!r},"
-            "fullname={self.first_name!r},"
-            "{self.last_name!r}, email={self.email})"
-        )
+        return f"(Name={self.first_name!r})"
 
 
 class UserValidationSchema(BaseModel):
@@ -94,9 +96,6 @@ class UserValidationSchema(BaseModel):
         str,
         constr(min_length=8, max_length=100, regex=r"^[A-Za-z0-9@#$%^&+=]+$"),
     ]
-
-    created_at: datetime = datetime.now()
-    updated_at: datetime = datetime.now()
 
     status: str = UserStatus.ACTIVE.value
     profile_link: Optional[HttpUrl]
