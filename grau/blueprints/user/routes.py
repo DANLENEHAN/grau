@@ -23,6 +23,7 @@ def create_user():
           application/json:
             schema:
               $ref: '#/components/schemas/UserSchema'
+      security: []
       responses:
         '201':
           description: User created successfully
@@ -38,8 +39,8 @@ def login():
     post:
       tags:
           - Users
-      summary: Login a user.
-      description: Login a user.
+      summary: Login a user
+      description: Logs in and returns the authentication cookie
       requestBody:
         required: true
         content:
@@ -53,9 +54,25 @@ def login():
                 password:
                   type: string
                   example: RLp6^$L2Ro
+      security: []
       responses:
         '200':
-          description: Login successful
+          description: >
+            Login successful
+            Note: The below doesn't actually work see
+            https://github.com/swagger-api/swagger-ui/issues/5596
+            The session ID is returned in the Response headers `Set-Cookie`
+            headers `session` key. You need to include this cookie in subsequent
+            requests. If using Swagger UI, you can find the cookie in the network
+            tab of the developer tools. Add the cookie to the request headers
+            by clicking the Lock/Authorize button in the UI at the top of page
+            for global authorization or on a per request basis at the endpoint
+            level.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session=.eJwlzstOwkAUgOF3m; HttpOnly; Path=/
         '401':
           description: Login failed
     """
@@ -72,6 +89,8 @@ def logout():
         - Users
       summary: Logout a user.
       description: Logout a user.
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: Logout successful
@@ -90,6 +109,8 @@ def test_auth():
         - Users
       summary: Test authentication.
       description: Test authentication.
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: User authenticated

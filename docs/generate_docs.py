@@ -93,6 +93,13 @@ if __name__ == "__main__":
         "paths": paths,
         # Components are the schemas
         "components": {
+            "securitySchemes": {
+                "cookieAuth": {
+                    "type": "apiKey",
+                    "in": "cookie",
+                    "name": "session",
+                }
+            },
             "schemas": validation_schema_json["$defs"],
         },
     }

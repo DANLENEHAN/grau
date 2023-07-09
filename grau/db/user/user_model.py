@@ -108,10 +108,6 @@ class UserSchema(BaseModel):
         description="Language setting for the user's account",
     )
 
-    _validate_birthday = validator("birthday", allow_reuse=True)(
-        lambda birthday: datetime.strptime(birthday, DateFormat.YMD.value)
-    )
-
     _validate_password = validator("password", allow_reuse=True)(
         lambda password: encrypt_str(secret_str=password)
     )
