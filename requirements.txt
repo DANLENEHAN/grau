@@ -10,4 +10,5 @@ freezegun==1.2.2
 # in the pyproject.toml file, dependencies section. Bar e.g. psycopg2
 psycopg2==2.9.6
 pylint==2.17.4
+PyYAML==6.0
 Werkzeug==2.0.3

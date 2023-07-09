@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from flask_login import UserMixin
@@ -74,14 +74,17 @@ class UserSchema(BaseModel):
 
     email: EmailStr = Field(example="dan@gmail.com")
     password: str = Field(
-        min_length=8, max_length=100, pattern=r"^[A-Za-z0-9@#$%^&+=]+$"
+        min_length=8,
+        max_length=100,
+        pattern=r"^[A-Za-z0-9@#$%^&+=]+$",
+        example="RLp6^$L2Ro",
     )
 
     status: ProfileStatus = Field(default=ProfileStatus.ACTIVE.value)
     premium: bool = Field(default=False)
 
     age: int = Field(ge=0, le=125)
-    birthday: str = Field(min_length=10, max_length=10)
+    birthday: date = Field(example="1997-05-18")
     first_name: str = Field(
         min_length=3, max_length=50, pattern=r"^[A-Za-z0-9]+$", example="Dan"
     )
@@ -93,7 +96,7 @@ class UserSchema(BaseModel):
     )
     gender: Gender
 
-    phone_number: PhoneNumber = Field(example="07123456789")
+    phone_number: PhoneNumber = Field(example="+447308831531")
     height_unit_pref: HeightUnits
     weight_unit_pref: WeightUnits
     date_format_pref: DateFormat

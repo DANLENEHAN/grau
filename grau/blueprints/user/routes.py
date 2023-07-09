@@ -35,26 +35,24 @@ def create_user():
 @user_api.route("/login", methods=["POST"])
 def login():
     """
-    get:
+    post:
       tags:
           - Users
       summary: Login a user.
       description: Login a user.
-      parameters:
-        - name: email
-          in: query
-          description: email of the user to login
-          required: true
-          schema:
-            type: string
-            example: dan@gmail.com
-        - name: password
-          in: query
-          description: password of the user to login
-          required: true
-          schema:
-            type: string
-            example:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: dan@gmail.com
+                password:
+                  type: string
+                  example: RLp6^$L2Ro
       responses:
         '200':
           description: Login successful

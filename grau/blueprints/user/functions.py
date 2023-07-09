@@ -74,14 +74,15 @@ def attempt_logout(
     Returns:
         tuple[str, int]: tuple containing the response message and status code
     """
-    user = (
-        db_session.query(User)
-        .filter(and_(User.session_id == decrypt_str(session_id)))
-        .one_or_none()
-    )
-    if user:
-        user.session_id = None
-        db_session.commit()
-        logout_user()
-        return "Logout successful", 200
+    if session_id:
+        user = (
+            db_session.query(User)
+            .filter(and_(User.session_id == decrypt_str(session_id)))
+            .one_or_none()
+        )
+        if user:
+            user.session_id = None
+            db_session.commit()
+            logout_user()
+            return "Logout successful", 200
     return "Logout failed, user not logged in", 400
