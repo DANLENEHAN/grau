@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from grau.db.user.user_model import User, UserValidationSchema
+from grau.db.user.user_model import User, UserSchema
 from grau.utils import decrypt_str
 
 
@@ -12,7 +12,6 @@ class TestUserModel:
 
     user_object = {
         "age": 25,
-        "area_code": "353",
         "birthday": "1997-05-18",
         "date_format_pref": "%d-%m-%Y",
         "email": "dan@trainai.com",
@@ -35,7 +34,7 @@ class TestUserModel:
         """
 
         # validating and defaulting user schema
-        user_object = UserValidationSchema(**self.user_object)
+        user_object = UserSchema(**self.user_object)
         # create user object
         user = User(**user_object.dict())
         # if invalid fields passed an exception will be raised

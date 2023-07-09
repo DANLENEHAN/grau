@@ -11,7 +11,6 @@ class TestUserSessionIntegration:
 
     user_object = {
         "age": 25,
-        "area_code": "353",
         "birthday": "1997-05-18",
         "date_format_pref": "%d-%m-%Y",
         "email": "dan@trainai.com",

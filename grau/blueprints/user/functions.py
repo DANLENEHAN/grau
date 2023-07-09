@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user
 from sqlalchemy import and_
 from sqlalchemy.orm import scoped_session
 
-from grau.db.user.user_model import User, UserValidationSchema
+from grau.db.user.user_model import User, UserSchema
 from grau.exceptions.grau_exceptions import ResourceAlreadyExists
 from grau.utils import decrypt_str
 
@@ -33,7 +33,7 @@ def create_user(
     Returns:
         tuple[str, int]: tuple containing the response message and status code
     """
-    user = User(**UserValidationSchema(**user_dict).dict())
+    user = User(**UserSchema(**user_dict).dict())
     if get_user(db_session, user.email):
         raise ResourceAlreadyExists("Email already assoicated with account")
 
@@ -84,4 +84,4 @@ def attempt_logout(
         db_session.commit()
         logout_user()
         return "Logout successful", 200
-    return "Logout failed, invalid db_session", 400
+    return "Logout failed, user not logged in", 400

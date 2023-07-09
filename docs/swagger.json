@@ -1,0 +1,283 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "GRAU API",
+        "description": "The GRAU API: a RESTful API for the GRAU project. Bringing the power to the people.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:5000",
+            "description": "Local server"
+        }
+    ],
+    "paths": {
+        "/create_user": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user.",
+                "description": "Create a new user.",
+                "requestBody": {
+                    "description": "User object to be created",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    },
+                    "409": {
+                        "description": "User already exists"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login a user.",
+                "description": "Login a user.",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "email of the user to login",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "dan@gmail.com"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "password of the user to login",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": null
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Login failed"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Logout a user.",
+                "description": "Logout a user.",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful"
+                    },
+                    "400": {
+                        "description": "Logout failed due to invalid credentials"
+                    }
+                }
+            }
+        },
+        "/user_authenticated": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Test authentication.",
+                "description": "Test authentication.",
+                "responses": {
+                    "200": {
+                        "description": "User authenticated"
+                    },
+                    "500": {
+                        "description": "User not authenticated"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DateFormat": {
+                "description": "Accepted date formats.",
+                "enum": [
+                    "%Y-%m-%d",
+                    "%m-%d-%Y",
+                    "%d-%m-%Y"
+                ],
+                "title": "DateFormat",
+                "type": "string"
+            },
+            "Gender": {
+                "description": "Enum for user gender",
+                "enum": [
+                    "male",
+                    "female"
+                ],
+                "title": "Gender",
+                "type": "string"
+            },
+            "HeightUnits": {
+                "description": "Height units.",
+                "enum": [
+                    "cm",
+                    "inch",
+                    "feet"
+                ],
+                "title": "HeightUnits",
+                "type": "string"
+            },
+            "ProfileStatus": {
+                "description": "Enum for user status",
+                "enum": [
+                    "active",
+                    "inactive",
+                    "deleted",
+                    "banned"
+                ],
+                "title": "ProfileStatus",
+                "type": "string"
+            },
+            "UserSchema": {
+                "description": "\n    Schema for validating user data\n    ",
+                "properties": {
+                    "username": {
+                        "example": "danlen97",
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "Username",
+                        "type": "string"
+                    },
+                    "email": {
+                        "example": "dan@gmail.com",
+                        "format": "email",
+                        "title": "Email",
+                        "type": "string"
+                    },
+                    "password": {
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9@#$%^&+=]+$",
+                        "title": "Password",
+                        "type": "string"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileStatus"
+                            }
+                        ],
+                        "default": "active"
+                    },
+                    "premium": {
+                        "default": false,
+                        "title": "Premium",
+                        "type": "boolean"
+                    },
+                    "age": {
+                        "maximum": 125,
+                        "minimum": 0,
+                        "title": "Age",
+                        "type": "integer"
+                    },
+                    "birthday": {
+                        "maxLength": 10,
+                        "minLength": 10,
+                        "title": "Birthday",
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "example": "Dan",
+                        "maxLength": 50,
+                        "minLength": 3,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "First Name",
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "example": "Lenehan",
+                        "maxLength": 50,
+                        "minLength": 3,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "Last Name",
+                        "type": "string"
+                    },
+                    "gender": {
+                        "$ref": "#/components/schemas/Gender"
+                    },
+                    "phone_number": {
+                        "example": "07123456789",
+                        "maxLength": 64,
+                        "minLength": 7,
+                        "title": "Phone Number",
+                        "type": "string"
+                    },
+                    "height_unit_pref": {
+                        "$ref": "#/components/schemas/HeightUnits"
+                    },
+                    "weight_unit_pref": {
+                        "$ref": "#/components/schemas/WeightUnits"
+                    },
+                    "date_format_pref": {
+                        "$ref": "#/components/schemas/DateFormat"
+                    },
+                    "language": {
+                        "description": "Language setting for the user's account",
+                        "example": "en",
+                        "maxLength": 10,
+                        "minLength": 2,
+                        "pattern": "^[A-Za-z]+$",
+                        "title": "Language",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "username",
+                    "email",
+                    "password",
+                    "age",
+                    "birthday",
+                    "first_name",
+                    "last_name",
+                    "gender",
+                    "phone_number",
+                    "height_unit_pref",
+                    "weight_unit_pref",
+                    "date_format_pref",
+                    "language"
+                ],
+                "title": "UserSchema",
+                "type": "object"
+            },
+            "WeightUnits": {
+                "description": "Weight units.",
+                "enum": [
+                    "lbs",
+                    "kg",
+                    "stone"
+                ],
+                "title": "WeightUnits",
+                "type": "string"
+            }
+        }
+    }
+}
