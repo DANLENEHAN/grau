@@ -12,6 +12,7 @@ from flask_sqlalchemy_session import flask_scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from grau.blueprints.user.routes import user_api
+from grau.blueprints.user_stats.routes import user_stats_api
 from grau.db.functions import get_session_maker
 from grau.db.user.user_model import User
 from grau.exceptions.exception_handlers import handle_grau_exception
@@ -31,6 +32,7 @@ def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
     """
     app = Flask(__name__)
     app.register_blueprint(user_api)
+    app.register_blueprint(user_stats_api)
     add_app_config(app)
     register_error_handlers(app)
 

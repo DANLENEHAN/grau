@@ -4,8 +4,8 @@ from typing import Optional
 from flask_login import UserMixin
 from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from sqlalchemy import TIMESTAMP, Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import TIMESTAMP, Boolean, Date, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from grau.db.enums import (DateFormat, Gender, HeightUnits, ProfileStatus,
                            WeightUnits)
@@ -38,7 +38,7 @@ class User(UserMixin, Base):
     premium: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    birthday: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    birthday: Mapped[date] = mapped_column(Date, nullable=True)
     first_name: Mapped[str] = mapped_column(String(100), nullable=True)
     last_name: Mapped[str] = mapped_column(String(100), nullable=True)
     gender: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -47,6 +47,8 @@ class User(UserMixin, Base):
     weight_unit_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     date_format_pref: Mapped[str] = mapped_column(String(50), nullable=True)
     language: Mapped[str] = mapped_column(String(50), nullable=True)
+
+    user_stats = relationship("UserStats", back_populates="user")
 
     def get_id(self) -> str:
         """_summary_

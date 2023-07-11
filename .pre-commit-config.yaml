@@ -44,9 +44,9 @@ repos:
         exclude: ^alembic/.*
         language: system
         types: [python]
-        args: [--rcfile=.pylintrc, --output-format=colorized]
+        args: ["--rcfile=.pylintrc", "--output-format=colorized", "--load-plugins=pylint.extensions.docparams"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.4.1
     hooks:
     -   id: mypy
         exclude: ^alembic/.*

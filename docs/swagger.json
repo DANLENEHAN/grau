@@ -1,145 +1,5 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-        "title": "GRAU API",
-        "description": "The GRAU API: a RESTful API for the GRAU project.Bringing the power to the people.",
-        "version": "1.0.0"
-    },
-    "servers": [
-        {
-            "url": "http://localhost:5000",
-            "description": "Local server"
-        }
-    ],
-    "paths": {
-        "/create_user": {
-            "post": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Create a new user.",
-                "description": "Create a new user.",
-                "requestBody": {
-                    "description": "User object to be created",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UserSchema"
-                            }
-                        }
-                    }
-                },
-                "security": [],
-                "responses": {
-                    "201": {
-                        "description": "User created successfully"
-                    },
-                    "409": {
-                        "description": "User already exists"
-                    }
-                }
-            }
-        },
-        "/login": {
-            "post": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Login a user",
-                "description": "Logs in and returns the authentication cookie",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "dan@gmail.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "RLp6^$L2Ro"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [],
-                "responses": {
-                    "200": {
-                        "description": "Login successful Note: The below doesn't actually work but is important for understanding how the login/logout and session management system works. See issue here: https://github.com/swagger-api/swagger-ui/issues/5596 The session ID is returned in the Response headers `Set-Cookie` headers `session` key. You need to include this cookie in subsequent requests. If using Swagger UI, you can find the cookie in the network tab of the developer tools. Add the cookie to the request headers by clicking the Lock/Authorize button in the UI at the top of page for global authorization or on a per request basis at the endpoint level.\n",
-                        "headers": {
-                            "Set-Cookie": {
-                                "schema": {
-                                    "type": "string",
-                                    "example": "session=.eJwlzstOwkAUgOF3m; HttpOnly; Path=/"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Login failed"
-                    }
-                }
-            }
-        },
-        "/logout": {
-            "post": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Logout a user.",
-                "description": "Logout a user.",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Logout successful"
-                    },
-                    "400": {
-                        "description": "Logout failed due to invalid credentials"
-                    }
-                }
-            }
-        },
-        "/user_authenticated": {
-            "get": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Test authentication.",
-                "description": "Test authentication.",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User authenticated"
-                    },
-                    "500": {
-                        "description": "User not authenticated"
-                    }
-                }
-            }
-        }
-    },
     "components": {
-        "securitySchemes": {
-            "cookieAuth": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "session"
-            }
-        },
         "schemas": {
             "DateFormat": {
                 "description": "Accepted date formats.",
@@ -184,41 +44,6 @@
             "UserSchema": {
                 "description": "\n    Schema for validating user data\n    ",
                 "properties": {
-                    "username": {
-                        "example": "danlen97",
-                        "maxLength": 100,
-                        "minLength": 8,
-                        "pattern": "^[A-Za-z0-9]+$",
-                        "title": "Username",
-                        "type": "string"
-                    },
-                    "email": {
-                        "example": "dan@gmail.com",
-                        "format": "email",
-                        "title": "Email",
-                        "type": "string"
-                    },
-                    "password": {
-                        "example": "RLp6^$L2Ro",
-                        "maxLength": 100,
-                        "minLength": 8,
-                        "pattern": "^[A-Za-z0-9@#$%^&+=]+$",
-                        "title": "Password",
-                        "type": "string"
-                    },
-                    "status": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/ProfileStatus"
-                            }
-                        ],
-                        "default": "active"
-                    },
-                    "premium": {
-                        "default": false,
-                        "title": "Premium",
-                        "type": "boolean"
-                    },
                     "age": {
                         "maximum": 125,
                         "minimum": 0,
@@ -231,12 +56,36 @@
                         "title": "Birthday",
                         "type": "string"
                     },
+                    "date_format_pref": {
+                        "$ref": "#/components/schemas/DateFormat"
+                    },
+                    "email": {
+                        "example": "dan@gmail.com",
+                        "format": "email",
+                        "title": "Email",
+                        "type": "string"
+                    },
                     "first_name": {
                         "example": "Dan",
                         "maxLength": 50,
                         "minLength": 3,
                         "pattern": "^[A-Za-z0-9]+$",
                         "title": "First Name",
+                        "type": "string"
+                    },
+                    "gender": {
+                        "$ref": "#/components/schemas/Gender"
+                    },
+                    "height_unit_pref": {
+                        "$ref": "#/components/schemas/HeightUnits"
+                    },
+                    "language": {
+                        "description": "Language setting for the user's account",
+                        "example": "en",
+                        "maxLength": 10,
+                        "minLength": 2,
+                        "pattern": "^[A-Za-z]+$",
+                        "title": "Language",
                         "type": "string"
                     },
                     "last_name": {
@@ -247,8 +96,13 @@
                         "title": "Last Name",
                         "type": "string"
                     },
-                    "gender": {
-                        "$ref": "#/components/schemas/Gender"
+                    "password": {
+                        "example": "RLp6^$L2Ro",
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9@#$%^&+=]+$",
+                        "title": "Password",
+                        "type": "string"
                     },
                     "phone_number": {
                         "example": "+447308831531",
@@ -257,23 +111,29 @@
                         "title": "Phone Number",
                         "type": "string"
                     },
-                    "height_unit_pref": {
-                        "$ref": "#/components/schemas/HeightUnits"
+                    "premium": {
+                        "default": false,
+                        "title": "Premium",
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileStatus"
+                            }
+                        ],
+                        "default": "active"
+                    },
+                    "username": {
+                        "example": "danlen97",
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "Username",
+                        "type": "string"
                     },
                     "weight_unit_pref": {
                         "$ref": "#/components/schemas/WeightUnits"
-                    },
-                    "date_format_pref": {
-                        "$ref": "#/components/schemas/DateFormat"
-                    },
-                    "language": {
-                        "description": "Language setting for the user's account",
-                        "example": "en",
-                        "maxLength": 10,
-                        "minLength": 2,
-                        "pattern": "^[A-Za-z]+$",
-                        "title": "Language",
-                        "type": "string"
                     }
                 },
                 "required": [
@@ -304,6 +164,146 @@
                 "title": "WeightUnits",
                 "type": "string"
             }
+        },
+        "securitySchemes": {
+            "cookieAuth": {
+                "in": "cookie",
+                "name": "session",
+                "type": "apiKey"
+            }
         }
-    }
+    },
+    "info": {
+        "description": "The GRAU API: a RESTful API for the GRAU project.Bringing the power to the people.",
+        "title": "GRAU API",
+        "version": "1.0.0"
+    },
+    "openapi": "3.0.0",
+    "paths": {
+        "/create_user": {
+            "post": {
+                "description": "Create a new user.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserSchema"
+                            }
+                        }
+                    },
+                    "description": "User object to be created",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    },
+                    "409": {
+                        "description": "User already exists"
+                    }
+                },
+                "security": [],
+                "summary": "Create a new user.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Logs in and returns the authentication cookie",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "example": "dan@gmail.com",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "example": "RLp6^$L2Ro",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful Note: The below doesn't actually work but is important for understanding how the login/logout and session management system works. See issue here: https://github.com/swagger-api/swagger-ui/issues/5596 The session ID is returned in the Response headers `Set-Cookie` headers `session` key. You need to include this cookie in subsequent requests. If using Swagger UI, you can find the cookie in the network tab of the developer tools. Add the cookie to the request headers by clicking the Lock/Authorize button in the UI at the top of page for global authorization or on a per request basis at the endpoint level.\n",
+                        "headers": {
+                            "Set-Cookie": {
+                                "schema": {
+                                    "example": "session=.eJwlzstOwkAUgOF3m; HttpOnly; Path=/",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Login failed"
+                    }
+                },
+                "security": [],
+                "summary": "Login a user",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "Logout a user.",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful"
+                    },
+                    "400": {
+                        "description": "Logout failed due to invalid credentials"
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "summary": "Logout a user.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/user_authenticated": {
+            "get": {
+                "description": "Test authentication.",
+                "responses": {
+                    "200": {
+                        "description": "User authenticated"
+                    },
+                    "500": {
+                        "description": "User not authenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "summary": "Test authentication.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        }
+    },
+    "servers": [
+        {
+            "description": "Local server",
+            "url": "http://localhost:5000"
+        }
+    ]
 }
