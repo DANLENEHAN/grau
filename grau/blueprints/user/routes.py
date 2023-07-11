@@ -59,7 +59,8 @@ def login():
         '200':
           description: >
             Login successful
-            Note: The below doesn't actually work see
+            Note: The below doesn't actually work but is important for understanding
+            how the login/logout and session management system works. See issue here:
             https://github.com/swagger-api/swagger-ui/issues/5596
             The session ID is returned in the Response headers `Set-Cookie`
             headers `session` key. You need to include this cookie in subsequent
