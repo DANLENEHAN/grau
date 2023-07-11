@@ -1,6 +1,26 @@
 from enum import Enum
 
 
+class ProfileStatus(Enum):
+    """
+    Enum for user status
+    """
+
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+    BANNED = "banned"
+
+
+class Gender(Enum):
+    """
+    Enum for user gender
+    """
+
+    MALE = "male"
+    FEMALE = "female"
+
+
 class StatusCode(Enum):
     """
     HTTP response status codes.

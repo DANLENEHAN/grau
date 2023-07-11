@@ -49,7 +49,8 @@ repos:
     rev: v1.4.1
     hooks:
     -   id: mypy
-        exclude: "alembic/.*,tests/.*"
+        exclude: ^alembic/.*
+        args: ["--install-types", "--non-interactive", "--ignore-missing-imports"]
 - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
   rev: v0.1.0
   hooks:

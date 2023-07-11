@@ -1,4 +1,3 @@
-import datetime as dt
 from typing import Dict
 from unittest.mock import ANY, MagicMock, patch
 
@@ -21,24 +20,20 @@ class UserFactory:
         self.current_id += 1
         user = {
             "id": user_id,
-            "username": "test_user",
-            "email": "test_email@emial.com",
-            "password": "test_password",
-            "session_id": "test_session_id",
-            "status": "active",
-            "profile_link": "https://wwww.test.com",
-            "premium": False,
-            "age": 21,
-            "birthday": dt.date(2000, 1, 1).strftime("%Y-%m-%d"),
-            "first_name": "dan",
-            "last_name": "test",
+            "age": 25,
+            "birthday": "1997-05-18",
+            "date_format_pref": "%d-%m-%Y",
+            "email": "dan@trainai.com",
+            "first_name": "Dan",
             "gender": "male",
-            "phone_number": "1234567890",
-            "area_code": "123",
             "height_unit_pref": "cm",
-            "weight_unit_pref": "lbs",
-            "date_format_pref": "%Y-%m-%d",
-            "language": "en",
+            "language": "english",
+            "last_name": "lenehan",
+            "password": "testing123",
+            "phone_number": "+447308831531",
+            "premium": True,
+            "username": "danlen97",
+            "weight_unit_pref": "kg",
         }
         user.update(kwargs)
         return user

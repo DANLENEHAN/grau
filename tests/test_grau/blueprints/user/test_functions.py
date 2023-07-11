@@ -11,7 +11,6 @@ class TestUserSessionIntegration:
 
     user_object = {
         "age": 25,
-        "area_code": "353",
         "birthday": "1997-05-18",
         "date_format_pref": "%d-%m-%Y",
         "email": "dan@trainai.com",
@@ -21,7 +20,8 @@ class TestUserSessionIntegration:
         "language": "english",
         "last_name": "lenehan",
         "password": "testing123",
-        "phone_number": "6307731531",
+        "phone_number": "+447308831531",
+        "premium": True,
         "username": "danlen97",
         "weight_unit_pref": "kg",
     }
