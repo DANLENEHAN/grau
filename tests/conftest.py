@@ -22,6 +22,7 @@ functionality at a time
 """
 
 import os
+from typing import Any, Dict, Generator, Optional
 from unittest.mock import patch
 
 import pytest
@@ -91,16 +92,28 @@ def app(session_factory):
 
 
 @pytest.fixture()
-def insert_user_stat(db_session):
+def insert_user_stat(db_session, user_stats_factory):
     """
     This is a fixture that can be used to insert a user stat into the database. It's a function that can be called to insert a user stat
     Scope: function - This means that the client will be created once per test function
     """
 
-    def _insert_user_stat(user_stat):
+    def _insert_user_stat(
+        user_stat: Optional[Dict] = None, user_id: Optional[int] = None
+    ):
+        if user_stat is None:
+            user_stat = user_stats_factory(user_id=user_id)
+
         _, response_code = create_user_stats(db_session, user_stat)
         if response_code != 201:
             raise Exception(f"Failed to insert user: {user_stat}")
+        # Get last user stat added to the db
+        user_stat = (
+            db_session.query(UserStats)
+            .filter(UserStats.user_id == user_stat["user_id"])
+            .order_by(UserStats.id.desc())
+            .first()
+        )
         return user_stat
 
     yield _insert_user_stat
@@ -110,19 +123,36 @@ def insert_user_stat(db_session):
 
 
 @pytest.fixture()
-def insert_user(db_session):
+def insert_user(db_session, user_factory, login_user):
     """
     This is a fixture that can be used to insert a user into the database. It's a function that can be called to insert a user
     Scope: function - This means that the client will be created once per test function
     """
 
-    def _insert_user(user):
+    def _insert_user(user: Optional[Dict] = None, login: bool = True):
         """
         This is a function that can be called to insert a user
+
+        Args:
+            user: The user to insert. If None, a user will be created using the user_factory
+            login: If True, the user will be logged in after being created
+
+        Returns:
+            The user that was inserted
+
+        Raises:
+            Exception: If the user was not inserted successfully
         """
+        if user is None:
+            user = user_factory()
         _, response_code = create_user(db_session, user)
         if response_code != 201:
             raise Exception(f"Failed to insert user: {user}")
+        user = (
+            db_session.query(User).filter(User.email == user["email"]).first()
+        )
+        if login:
+            login_user(user)
         return user
 
     yield _insert_user
@@ -150,10 +180,7 @@ def login_user(client):
         """
         response = client.post(
             "/login",
-            json={
-                "email": user["email"],
-                "password": user["password"],
-            },
+            json={"email": user.email, "password": decrypt_str(user.password)},
         )
         if response.status_code != 200:
             raise Exception(f"Login failed: {response.status_code}")
@@ -164,3 +191,73 @@ def login_user(client):
 @pytest.fixture()
 def client(app):
     return app.test_client()
+
+
+@pytest.fixture
+def test_integration(client):
+    def _run_integration_tests(test_cases):
+        for test_case in test_cases:
+            test_case = test_case.to_dict()
+            if test_case["method"] == "POST":
+                response = client.post(
+                    test_case["endpoint"], json=test_case["payload"]
+                )
+            elif test_case["method"] == "GET":
+                response = client.get(
+                    test_case["endpoint"], json=test_case["payload"]
+                )
+            elif test_case["method"] == "PUT":
+                response = client.put(
+                    test_case["endpoint"], json=test_case["payload"]
+                )
+
+            assert response.status_code == test_case["expected_response_code"]
+            assert response.data == test_case["expected_response"]
+
+    return _run_integration_tests
+
+
+@pytest.fixture
+def user_factory():
+    def _create_user(**kwargs) -> Dict:
+        user = {
+            "age": 25,
+            "area_code": "353",
+            "birthday": "1997-05-18",
+            "date_format_pref": "%d-%m-%Y",
+            "email": "dan@trainai.com",
+            "first_name": "Dan",
+            "gender": "male",
+            "height_unit_pref": "cm",
+            "language": "english",
+            "last_name": "lenehan",
+            "password": "testing123",
+            "phone_number": "6307731531",
+            "username": "danlen97",
+            "weight_unit_pref": "kg",
+        }
+
+        # Update the user dictionary with any keyword arguments passed in
+        user.update(kwargs)
+
+        return user
+
+    return _create_user
+
+
+@pytest.fixture
+def user_stats_factory():
+    def _create_user_stat(user_id: int, **kwargs) -> Dict:
+        """
+        Returns a user stats dictionary.
+        """
+        user_stat = {
+            "user_id": user_id,
+            "value": 1,
+            "unit": "kg",
+            "note": "this note is a nice note",
+        }
+        user_stat.update(kwargs)
+        return user_stat
+
+    return _create_user_stat

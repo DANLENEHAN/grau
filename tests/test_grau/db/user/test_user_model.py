@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from grau.db.user.user_model import User, UserValidationSchema
 from grau.utils import decrypt_str
@@ -51,7 +51,7 @@ class TestUserModel:
         # or not included in original obj
         assert user.id == 1
         assert decrypt_str(user.password) == self.user_object["password"]
-        assert user.birthday == datetime(1997, 5, 18, 0, 0)
+        assert user.birthday == date(1997, 5, 18)
         assert user.status == "active"
 
         assert isinstance(user.created_at, datetime)
