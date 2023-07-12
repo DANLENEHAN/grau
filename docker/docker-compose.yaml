@@ -15,3 +15,18 @@ services:
       - .db_env
     ports:
       - 5432:5432
+  swagger:
+    image: swaggerapi/swagger-ui
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      - SWAGGER_JSON=/swagger.json
+      - PORT=80
+      - BASE_URL=/docs
+      # These two environment variables are a workaround for the swagger UI not being
+      # to send cookie headers: https://github.com/swagger-api/swagger-ui/issues/5596
+      - WITH_CREDENTIALS=true
+      - enableCORS=true
+    volumes:
+      - ../docs/swagger.json:/swagger.json

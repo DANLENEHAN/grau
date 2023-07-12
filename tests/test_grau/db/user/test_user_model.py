@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import date
 
-from grau.db.user.user_model import User, UserValidationSchema
+from grau.db.user.user_model import User, UserSchema
 from grau.utils import decrypt_str
 
 
@@ -12,7 +12,6 @@ class TestUserModel:
 
     user_object = {
         "age": 25,
-        "area_code": "353",
         "birthday": "1997-05-18",
         "date_format_pref": "%d-%m-%Y",
         "email": "dan@trainai.com",
@@ -22,7 +21,7 @@ class TestUserModel:
         "language": "english",
         "last_name": "lenehan",
         "password": "testing123",
-        "phone_number": "6307731531",
+        "phone_number": "+447308831531",
         "premium": True,
         "username": "danlen97",
         "weight_unit_pref": "kg",
@@ -35,7 +34,7 @@ class TestUserModel:
         """
 
         # validating and defaulting user schema
-        user_object = UserValidationSchema(**self.user_object)
+        user_object = UserSchema(**self.user_object)
         # create user object
         user = User(**user_object.dict())
         # if invalid fields passed an exception will be raised
@@ -44,7 +43,7 @@ class TestUserModel:
 
         # static fields: should be the same as the original
         for attribute, value in self.user_object.items():
-            if attribute not in ["password", "birthday"]:
+            if attribute not in ["password", "birthday", "phone_number"]:
                 assert getattr(user, attribute) == value
 
         # API defined or transformed fields: different
@@ -53,8 +52,9 @@ class TestUserModel:
         assert decrypt_str(user.password) == self.user_object["password"]
         assert user.birthday == date(1997, 5, 18)
         assert user.status == "active"
+        assert user.phone_number == "tel:+44-7308-831531"
 
-        assert isinstance(user.created_at, datetime)
-        assert isinstance(user.updated_at, datetime)
+        assert isinstance(user.created_at, date)
+        assert isinstance(user.updated_at, date)
         assert user.created_at == user.updated_at
         assert (user.session_id and user.profile_link) is None

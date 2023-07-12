@@ -232,7 +232,7 @@ def user_factory():
             "language": "english",
             "last_name": "lenehan",
             "password": "testing123",
-            "phone_number": "6307731531",
+            "phone_number": "+1 202-918-2132",
             "username": "danlen97",
             "weight_unit_pref": "kg",
         }

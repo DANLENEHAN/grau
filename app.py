@@ -39,7 +39,7 @@ def create_app(session_factory: sessionmaker = get_session_maker()) -> Flask:
     db_session = flask_scoped_session(session_factory, app)
     login_manager = LoginManager()
     login_manager.init_app(app)
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
     @login_manager.user_loader
     def load_user(user_id: str) -> User:

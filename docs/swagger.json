@@ -1,0 +1,309 @@
+{
+    "components": {
+        "schemas": {
+            "DateFormat": {
+                "description": "Accepted date formats.",
+                "enum": [
+                    "%Y-%m-%d",
+                    "%m-%d-%Y",
+                    "%d-%m-%Y"
+                ],
+                "title": "DateFormat",
+                "type": "string"
+            },
+            "Gender": {
+                "description": "Enum for user gender",
+                "enum": [
+                    "male",
+                    "female"
+                ],
+                "title": "Gender",
+                "type": "string"
+            },
+            "HeightUnits": {
+                "description": "Height units.",
+                "enum": [
+                    "cm",
+                    "inch",
+                    "feet"
+                ],
+                "title": "HeightUnits",
+                "type": "string"
+            },
+            "ProfileStatus": {
+                "description": "Enum for user status",
+                "enum": [
+                    "active",
+                    "inactive",
+                    "deleted",
+                    "banned"
+                ],
+                "title": "ProfileStatus",
+                "type": "string"
+            },
+            "UserSchema": {
+                "description": "\n    Schema for validating user data\n    ",
+                "properties": {
+                    "age": {
+                        "maximum": 125,
+                        "minimum": 0,
+                        "title": "Age",
+                        "type": "integer"
+                    },
+                    "birthday": {
+                        "example": "1997-05-18",
+                        "format": "date",
+                        "title": "Birthday",
+                        "type": "string"
+                    },
+                    "date_format_pref": {
+                        "$ref": "#/components/schemas/DateFormat"
+                    },
+                    "email": {
+                        "example": "dan@gmail.com",
+                        "format": "email",
+                        "title": "Email",
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "example": "Dan",
+                        "maxLength": 50,
+                        "minLength": 3,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "First Name",
+                        "type": "string"
+                    },
+                    "gender": {
+                        "$ref": "#/components/schemas/Gender"
+                    },
+                    "height_unit_pref": {
+                        "$ref": "#/components/schemas/HeightUnits"
+                    },
+                    "language": {
+                        "description": "Language setting for the user's account",
+                        "example": "en",
+                        "maxLength": 10,
+                        "minLength": 2,
+                        "pattern": "^[A-Za-z]+$",
+                        "title": "Language",
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "example": "Lenehan",
+                        "maxLength": 50,
+                        "minLength": 3,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "Last Name",
+                        "type": "string"
+                    },
+                    "password": {
+                        "example": "RLp6^$L2Ro",
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9@#$%^&+=]+$",
+                        "title": "Password",
+                        "type": "string"
+                    },
+                    "phone_number": {
+                        "example": "+447308831531",
+                        "maxLength": 64,
+                        "minLength": 7,
+                        "title": "Phone Number",
+                        "type": "string"
+                    },
+                    "premium": {
+                        "default": false,
+                        "title": "Premium",
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileStatus"
+                            }
+                        ],
+                        "default": "active"
+                    },
+                    "username": {
+                        "example": "danlen97",
+                        "maxLength": 100,
+                        "minLength": 8,
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "title": "Username",
+                        "type": "string"
+                    },
+                    "weight_unit_pref": {
+                        "$ref": "#/components/schemas/WeightUnits"
+                    }
+                },
+                "required": [
+                    "username",
+                    "email",
+                    "password",
+                    "age",
+                    "birthday",
+                    "first_name",
+                    "last_name",
+                    "gender",
+                    "phone_number",
+                    "height_unit_pref",
+                    "weight_unit_pref",
+                    "date_format_pref",
+                    "language"
+                ],
+                "title": "UserSchema",
+                "type": "object"
+            },
+            "WeightUnits": {
+                "description": "Weight units.",
+                "enum": [
+                    "lbs",
+                    "kg",
+                    "stone"
+                ],
+                "title": "WeightUnits",
+                "type": "string"
+            }
+        },
+        "securitySchemes": {
+            "cookieAuth": {
+                "in": "cookie",
+                "name": "session",
+                "type": "apiKey"
+            }
+        }
+    },
+    "info": {
+        "description": "The GRAU API: a RESTful API for the GRAU project.Bringing the power to the people.",
+        "title": "GRAU API",
+        "version": "1.0.0"
+    },
+    "openapi": "3.0.0",
+    "paths": {
+        "/create_user": {
+            "post": {
+                "description": "Create a new user.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserSchema"
+                            }
+                        }
+                    },
+                    "description": "User object to be created",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    },
+                    "409": {
+                        "description": "User already exists"
+                    }
+                },
+                "security": [],
+                "summary": "Create a new user.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Logs in and returns the authentication cookie",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "example": "dan@gmail.com",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "example": "RLp6^$L2Ro",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful Note: The below doesn't actually work but is important for understanding how the login/logout and session management system works. See issue here: https://github.com/swagger-api/swagger-ui/issues/5596 The session ID is returned in the Response headers `Set-Cookie` headers `session` key. You need to include this cookie in subsequent requests. If using Swagger UI, you can find the cookie in the network tab of the developer tools. Add the cookie to the request headers by clicking the Lock/Authorize button in the UI at the top of page for global authorization or on a per request basis at the endpoint level.\n",
+                        "headers": {
+                            "Set-Cookie": {
+                                "schema": {
+                                    "example": "session=.eJwlzstOwkAUgOF3m; HttpOnly; Path=/",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Login failed"
+                    }
+                },
+                "security": [],
+                "summary": "Login a user",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "Logout a user.",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful"
+                    },
+                    "400": {
+                        "description": "Logout failed due to invalid credentials"
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "summary": "Logout a user.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        },
+        "/user_authenticated": {
+            "get": {
+                "description": "Test authentication.",
+                "responses": {
+                    "200": {
+                        "description": "User authenticated"
+                    },
+                    "500": {
+                        "description": "User not authenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "summary": "Test authentication.",
+                "tags": [
+                    "Users"
+                ]
+            }
+        }
+    },
+    "servers": [
+        {
+            "description": "Local server",
+            "url": "http://localhost:5000"
+        }
+    ]
+}
