@@ -32,6 +32,8 @@ def create_user(
         user_dict (dict[str:str]): dictionary containing user information
     Returns:
         tuple[str, int]: tuple containing the response message and status code
+    Raises:
+        ResourceAlreadyExists: if the user already exists
     """
     user = User(**UserSchema(**user_dict).dict())
     if get_user(db_session, user.email):
