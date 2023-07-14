@@ -49,6 +49,7 @@ class TestUserSessionIntegration:
         expected_response_code=200,
         method="GET",
     )
+
     unsuccessful_auth_step = IntegrationTestStep(
         endpoint="/user_authenticated",
         payload={},
