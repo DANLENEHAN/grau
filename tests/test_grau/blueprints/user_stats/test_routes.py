@@ -1,67 +1,6 @@
-from typing import Dict
 from unittest.mock import ANY, MagicMock, patch
 
 from freezegun import freeze_time
-
-
-class UserFactory:
-    """
-    Factory for creating users.
-    """
-
-    def __init__(self) -> None:
-        self.current_id: int = 1
-
-    def get_user(self, **kwargs) -> Dict:
-        """
-        Returns a user dictionary.
-        """
-        user_id = self.current_id
-        self.current_id += 1
-        user = {
-            "id": user_id,
-            "age": 25,
-            "birthday": "1997-05-18",
-            "date_format_pref": "%d-%m-%Y",
-            "email": "dan@trainai.com",
-            "first_name": "Dan",
-            "gender": "male",
-            "height_unit_pref": "cm",
-            "language": "english",
-            "last_name": "lenehan",
-            "password": "testing123",
-            "phone_number": "+447308831531",
-            "premium": True,
-            "username": "danlen97",
-            "weight_unit_pref": "kg",
-        }
-        user.update(kwargs)
-        return user
-
-
-class UserStatsFactory:
-    """
-    Factory for creating user stats.
-    """
-
-    def __init__(self):
-        self.current_id: int = 1
-
-    def get_user_stats(self, user_id: int, **kwargs) -> Dict:
-        """
-        Returns a user stats dictionary.
-        """
-        id_ = self.current_id
-        self.current_id += 1
-        stat = {
-            "id": id_,
-            "user_id": user_id,
-            "value": 1,
-            "unit": "kg",
-            "note": "this note is a nice note",
-        }
-        stat.update(kwargs)
-        return stat
 
 
 class TestRoutes:
@@ -69,27 +8,20 @@ class TestRoutes:
     Test routes for user_stats.
     """
 
-    user_factory = UserFactory()
-    user_stat_factory = UserStatsFactory()
-
     @patch("grau.blueprints.user_stats.routes.functions.create_user_stats")
     def test_create_user_stats(
         self,
         mock_create_user_stats: MagicMock,
         client,
         insert_user,
-        login_user,
+        user_stats_factory,
     ):
         """
         Test create_user_stats route.
         """
         # Given
-        test_user_a = self.user_factory.get_user(id=13)
-        test_user_stat = self.user_stat_factory.get_user_stats(
-            user_id=test_user_a["id"]
-        )
-        user = insert_user(test_user_a)
-        login_user(user)
+        user = insert_user()
+        test_user_stat = user_stats_factory(user_id=user.id)
 
         # When
         client.post(
@@ -102,15 +34,13 @@ class TestRoutes:
             db_session=ANY, user_stats_dict=test_user_stat
         )
 
-    def test_create_user_stats_no_login(self, client):
+    def test_create_user_stats_no_login(self, client, user_stats_factory):
         """
         Test create_user_stats route.
         """
         # Given
 
-        test_user_stat = self.user_stat_factory.get_user_stats(
-            user_id=99999999
-        )
+        test_user_stat = user_stats_factory(user_id=1)
 
         # When
         response = client.post(
@@ -130,28 +60,28 @@ class TestRoutes:
         mock_delete_user_stat: MagicMock,
         client,
         insert_user,
-        login_user,
         insert_user_stat,
+        user_stats_factory,
     ):
         """
         Test delete_user_stats route.
         """
         # Given
-        test_user = insert_user(self.user_factory.get_user(id=17))
-        test_user_stat = insert_user_stat(
-            self.user_stat_factory.get_user_stats(user_id=test_user["id"])
-        )
-        login_user(test_user)
+        test_user = insert_user()
+        user_stat = user_stats_factory(user_id=test_user.id)
+        test_user_stat = insert_user_stat(user_stat)
+        user_stat["id"] = test_user_stat.id
+
         # When
         client.delete(
             "/delete_user_stat",
-            json={"user_stats_dict": test_user_stat.copy()},
+            json={"user_stats_dict": user_stat.copy()},
         )
         # Then
         mock_delete_user_stat.assert_called_once_with(
             db_session=ANY,
-            user_id=test_user["id"],
-            stat_id=test_user_stat["id"],
+            user_id=test_user.id,
+            stat_id=test_user_stat.id,
         )
 
     @patch(
@@ -164,39 +94,30 @@ class TestRoutes:
         mock_update_user_stat: MagicMock,
         client,
         insert_user,
-        login_user,
+        user_stats_factory,
         insert_user_stat,
     ):
         """
         Test update_user_stat route.
         """
         # Given
-        test_user = insert_user(self.user_factory.get_user())
-        test_user_stat = insert_user_stat(
-            self.user_stat_factory.get_user_stats(user_id=test_user["id"])
-        )
-        login_user(test_user)
+        test_user = insert_user()
+        user_stat = user_stats_factory(user_id=test_user.id)
+        test_user_stat = insert_user_stat(user_stat)
+        user_stat["id"] = test_user_stat.id
 
-        updated_user_stat = test_user_stat.copy()
+        updated_user_stat = user_stat.copy()
         updated_user_stat["value"] = 2
         updated_user_stat["unit"] = "lbs"
 
         # When
+
         client.put(
             "/update_user_stat",
             json={"user_stats_dict": updated_user_stat.copy()},
         )
         # Then
         expected_user_stat = updated_user_stat.copy()
-        # TODO: This is a hack to get around the fact that the datetime
-        # is beign converted to a string by the json encoder
-        expected_user_stat["created_at"] = expected_user_stat[
-            "created_at"
-        ].strftime("%a, %d %b %Y %H:%M:%S GMT")
-        expected_user_stat["updated_at"] = expected_user_stat[
-            "updated_at"
-        ].strftime("%a, %d %b %Y %H:%M:%S GMT")
-
         mock_update_user_stat.assert_called_once_with(
             db_session=ANY,
             user_stats_dict=expected_user_stat,
@@ -207,20 +128,18 @@ class TestRoutes:
         self,
         mock_get_user_stats: MagicMock,
         insert_user,
-        login_user,
         client,
     ):
         """
         Test get_user_stats route.
         """
         # Given
-        test_user = insert_user(self.user_factory.get_user())
-        login_user(test_user)
+        test_user = insert_user()
 
         # When
-        client.get("/get_user_stats", json={"user_id": test_user["id"]})
+        client.get("/get_user_stats", json={"user_id": test_user.id})
 
         # Then
         mock_get_user_stats.assert_called_once_with(
-            db_session=ANY, user_id=test_user["id"]
+            db_session=ANY, user_id=test_user.id
         )

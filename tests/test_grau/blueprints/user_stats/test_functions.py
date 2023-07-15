@@ -1,5 +1,3 @@
-from typing import Dict
-
 import pytest
 
 from grau.blueprints.user_stats import functions
@@ -10,13 +8,6 @@ class TestFunctions:
     Test functions for user_stats.
     """
 
-    user_stat: Dict = {
-        "id": 1,
-        "user_id": 1,
-        "value": 1,
-        "unit": "kg",
-        "note": "this note is a nice note",
-    }
     user_id_no_stats: int = 404
 
     @pytest.mark.usefixtures("frozen_datetime")
@@ -25,97 +16,106 @@ class TestFunctions:
         Test get_user_stats function.
         """
         # Given
-        user_stat = self.user_stat.copy()
-        user_stat["id"] = 1
-        insert_user_stat(user_stat)
+        user_id = 1
+        insert_stat = insert_user_stat(user_id=user_id)
 
         # When
         result = functions.get_user_stat(
             db_session,
-            user_id=user_stat["user_id"],
-            stat_id=user_stat["id"],
+            user_id=user_id,
+            stat_id=insert_stat.id,
         )
         # then
-        for key, value in user_stat.items():
+        for key, value in insert_stat.__dict__.items():
             assert result.__dict__[key] == value
 
     @pytest.mark.usefixtures("frozen_datetime")
-    def test_update_user_stat(self, db_session, insert_user_stat):
+    def test_update_user_stat(
+        self, db_session, insert_user_stat, user_stats_factory
+    ):
         """
         Test update_user_stat function.
         """
         # Given
-        user_stat = self.user_stat.copy()
-        user_stat["id"] = 2
-        insert_user_stat(user_stat)
-        new_user_stat = user_stat.copy()
-        new_user_stat["value"] = 2
-        new_user_stat["unit"] = "lbs"
+        user_stat = user_stats_factory(user_id=1)
+        updated_user_stat = user_stat.copy()
+        inserted_user_stat = insert_user_stat(user_stat)
+        expected_result = inserted_user_stat.__dict__.copy()
+
+        updated_user_stat["id"] = inserted_user_stat.id
+        updated_user_stat["value"] = 2
+        updated_user_stat["unit"] = "lbs"
 
         # When
         request_response = functions.update_user_stat(
-            db_session, new_user_stat
+            db_session, updated_user_stat
         )
         result = functions.get_user_stat(
             db_session,
-            user_id=user_stat["user_id"],
-            stat_id=user_stat["id"],
+            user_id=inserted_user_stat.user_id,
+            stat_id=inserted_user_stat.id,
         )
         # then
         assert request_response == ("User stat updated successfully", 200)
-        for key, value in new_user_stat.items():
-            if key in ["created_at", "updated_at"]:
+        for key, value in expected_result.items():
+            if key == "value":
+                assert result.__dict__[key] == 2
+            elif key == "unit":
+                assert result.__dict__[key] == "lbs"
+            elif key == "updated_at":
                 continue
-            assert result.__dict__[key] == value
+            else:
+                assert result.__dict__[key] == value
 
     @pytest.mark.usefixtures("frozen_datetime")
-    def test_get_user_stats(self, db_session, insert_user_stat):
+    def test_get_user_stats(
+        self, db_session, insert_user_stat, user_stats_factory
+    ):
         """
         Test get_user_statss function.
         """
         # Given
-        user_stat = self.user_stat.copy()
-        user_stat["id"] = 3
-        user_stat["user_id"] = 2
-        new_user_stat = {
-            "id": 4,
-            "user_id": 2,
-            "value": 2,
-            "unit": "kg",
-            "note": "this note is another nice note",
-        }
-        insert_user_stat(user_stat)
-        insert_user_stat(new_user_stat)
+        user_id = 1
+        stats = [
+            user_stats_factory(user_id=1, unit="kg"),
+            user_stats_factory(user_id=1, unit="lbs"),
+        ]
+        inserted_stats = [
+            insert_user_stat(stats[0]),
+            insert_user_stat(stats[1]),
+        ]
 
         # When
         stat_result_a, stat_result_b = functions.get_user_stats(
-            db_session, user_id=user_stat["user_id"]
+            db_session, user_id=user_id
         )
         # then
-        for key, value in user_stat.items():
+        for key, value in inserted_stats[0].__dict__.items():
             assert stat_result_a.__dict__[key] == value
-            assert stat_result_b.__dict__[key] == new_user_stat[key]
+            assert (
+                stat_result_b.__dict__[key] == inserted_stats[1].__dict__[key]
+            )
 
     @pytest.mark.usefixtures("frozen_datetime")
-    def test_delete_user_stat(self, db_session, insert_user_stat):
+    def test_delete_user_stat(
+        self, db_session, insert_user_stat, user_stats_factory
+    ):
         """
         Test delete_user_stat function.
         """
         # Given
-        user_stat = self.user_stat.copy()
-        user_stat["id"] = 5
-        insert_user_stat(user_stat)
+        inserted_stat = insert_user_stat(user_stats_factory(user_id=1))
 
         # When
         functions.delete_user_stat(
             db_session,
-            user_id=user_stat["user_id"],
-            stat_id=user_stat["id"],
+            user_id=inserted_stat.user_id,
+            stat_id=inserted_stat.id,
         )
         result = functions.get_user_stat(
             db_session,
-            user_id=user_stat["user_id"],
-            stat_id=user_stat["id"],
+            user_id=inserted_stat.user_id,
+            stat_id=inserted_stat.id,
         )
         # then
         assert result is None
@@ -136,13 +136,13 @@ class TestFunctions:
         assert result is None
 
     @pytest.mark.usefixtures("frozen_datetime")
-    def test_update_user_stat_no_stat(self, db_session):
+    def test_update_user_stat_no_stat(self, db_session, user_stats_factory):
         """
         Test update_user_stat function.
         """
         # Given
-        user_stat = self.user_stat.copy()
-        user_stat["user_id"] = self.user_id_no_stats
+        user_stat = user_stats_factory(user_id=1)
+        user_stat["id"] = self.user_id_no_stats
         # When
         request_response = functions.update_user_stat(db_session, user_stat)
         # then
@@ -154,7 +154,6 @@ class TestFunctions:
         Test get_user_statss function.
         """
         # Given
-        self.user_stat.copy()
 
         # When
         result = functions.get_user_stats(
@@ -169,7 +168,6 @@ class TestFunctions:
         Test delete_user_stat function.
         """
         # Given
-        self.user_stat.copy()
 
         # When
         result = functions.delete_user_stat(

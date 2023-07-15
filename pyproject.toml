@@ -6,7 +6,7 @@ dependencies = [
 		"Flask==2.0.1",
 		"Flask-SQLAlchemy-Session==1.1",
 		"pydantic==2.0",
-		"pydantic-extra-types-2.0.0",
+		"pydantic-extra-types==2.0.0",
 		"phonenumbers==8.13.15",
 		"email-validator==2.0.0.post2",
 		"Flask-Cors==3.0.10",

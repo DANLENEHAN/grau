@@ -33,8 +33,6 @@ def create_user_stats(
     Returns:
         tuple[str, int]: tuple containing the response message and status code
     """
-    user_stats_dict["created_at"] = datetime.now()
-    user_stats_dict["updated_at"] = datetime.now()
     user_stats = UserStats(**user_stats_dict)
     db_session.add(user_stats)
     db_session.commit()
@@ -75,13 +73,15 @@ def update_user_stat(
     user_stats = get_user_stat(
         db_session, user_stats_dict["user_id"], user_stats_dict["id"]
     )
-    if not user_stats:
+    if user_stats is None:
         return "User stat not found", 404
 
     user_stats_dict["updated_at"] = datetime.now()
 
     for key, value in user_stats_dict.items():
         setattr(user_stats, key, value)
+    # Update the user stats
+    db_session.add(user_stats)
     db_session.commit()
     return "User stat updated successfully", 200
 

@@ -3,7 +3,6 @@ from flask_login import login_required
 from flask_sqlalchemy_session import current_session
 
 from grau.blueprints.user import functions
-from grau.blueprints.user.functions import attempt_login, attempt_logout
 
 user_api = Blueprint("user_api", __name__)
 
@@ -80,7 +79,7 @@ def login():
         '401':
           description: Login failed
     """
-    return attempt_login(
+    return functions.attempt_login(
         current_session, request.json["email"], request.json["password"]
     )
 
@@ -101,7 +100,7 @@ def logout():
         '400':
           description: Logout failed due to invalid credentials
     """
-    return attempt_logout(current_session, session.get("_user_id"))
+    return functions.attempt_logout(current_session, session.get("_user_id"))
 
 
 @user_api.route("/user_authenticated", methods=["GET"])
