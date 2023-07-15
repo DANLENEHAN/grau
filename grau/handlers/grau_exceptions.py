@@ -1,9 +1,7 @@
-from werkzeug.exceptions import HTTPException
-
 from grau.db.enums import StatusCode
 
 
-class GrauException(HTTPException):
+class GrauException(Exception):
     """Base class for all exceptions raised by Grau."""
 
     code = StatusCode.INTERNAL_SERVER_ERROR.value

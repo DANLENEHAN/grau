@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from grau.blueprints.user import functions
-from grau.exceptions.grau_exceptions import ResourceAlreadyExists
+from grau.handlers.grau_exceptions import BadRequest, ResourceAlreadyExists
 from grau.utils import decrypt_str
 
 
@@ -48,7 +48,7 @@ class TestFunctions:
             db_session=db_session, user_dict=user.copy()
         )
         # Then
-        assert result == ("User created successfully", 201)
+        assert result == "User created successfully"
 
     def test_create_user_already_exists(
         self, db_session, insert_user, user_factory
@@ -79,7 +79,7 @@ class TestFunctions:
             password=decrypt_str(test_user.password),
         )
         # Then
-        assert result == ("Login successful", 200)
+        assert result == "Login successful"
 
     def test_attempt_login_no_user(self, db_session, user_factory):
         """
@@ -89,13 +89,14 @@ class TestFunctions:
         # Given
         user = user_factory()
         # When
-        result = functions.attempt_login(
-            db_session=db_session,
-            email=user["email"],
-            password=user["password"],
-        )
+        with pytest.raises(BadRequest) as excinfo:
+            functions.attempt_login(
+                db_session=db_session,
+                email=user["email"],
+                password=user["password"],
+            )
         # Then
-        assert result == ("Login failed, invalid credentials", 400)
+        assert excinfo.value.message == "Login failed, invalid credentials"
 
     # TODO: Fix this test, it is failing due to a misisng
     # session_id for the create user even after login
@@ -123,9 +124,10 @@ class TestFunctions:
 
         # Given
         # When
-        result = functions.attempt_logout(
-            db_session=db_session,
-            session_id=None,
-        )
+        with pytest.raises(BadRequest) as excinfo:
+            functions.attempt_logout(
+                db_session=db_session,
+                session_id=None,
+            )
         # Then
-        assert result == ("Logout failed, user not logged in", 400)
+        assert excinfo.value.message == "Logout failed, invalid session ID"

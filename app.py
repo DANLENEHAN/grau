@@ -15,10 +15,10 @@ from grau.blueprints.user.routes import user_api
 from grau.blueprints.user_stats.routes import user_stats_api
 from grau.db.functions import get_session_maker
 from grau.db.user.user_model import User
-from grau.exceptions.exception_handlers import handle_grau_exception
-from grau.exceptions.grau_exceptions import (BadRequest, GrauException,
-                                             ResourceAlreadyExists,
-                                             ResourceNotFound)
+from grau.handlers.api_response_handlers import handle_grau_exception
+from grau.handlers.grau_exceptions import (BadRequest, GrauException,
+                                           ResourceAlreadyExists,
+                                           ResourceNotFound)
 from grau.utils import decrypt_str, get_secret_key
 
 

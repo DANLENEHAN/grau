@@ -3,6 +3,8 @@ from flask_login import login_required
 from flask_sqlalchemy_session import current_session
 
 from grau.blueprints.user import functions
+from grau.db.enums import RequestType
+from grau.handlers.api_response_handlers import APIResponseHandler
 
 user_api = Blueprint("user_api", __name__)
 
@@ -30,7 +32,10 @@ def create_user():
           description: User already exists
     """
 
-    return functions.create_user(current_session, request.json)
+    return APIResponseHandler(
+        request_type=RequestType.POST,
+        response_body=functions.create_user(current_session, request.json),
+    ).response
 
 
 @user_api.route("/login", methods=["POST"])
@@ -56,7 +61,7 @@ def login():
                   example: RLp6^$L2Ro
       security: []
       responses:
-        '200':
+        '201':
           description: >
             Login successful
             Note: The below doesn't actually work but is important
@@ -79,9 +84,12 @@ def login():
         '401':
           description: Login failed
     """
-    return functions.attempt_login(
-        current_session, request.json["email"], request.json["password"]
-    )
+    return APIResponseHandler(
+        request_type=RequestType.POST,
+        response_body=functions.attempt_login(
+            current_session, request.json["email"], request.json["password"]
+        ),
+    ).response
 
 
 @user_api.route("/logout", methods=["POST"])
@@ -95,12 +103,17 @@ def logout():
       security:
         - cookieAuth: []
       responses:
-        '200':
+        '201':
           description: Logout successful
         '400':
           description: Logout failed due to invalid credentials
     """
-    return functions.attempt_logout(current_session, session.get("_user_id"))
+    return APIResponseHandler(
+        request_type=RequestType.POST,
+        response_body=functions.attempt_logout(
+            current_session, session.get("_user_id")
+        ),
+    ).response
 
 
 @user_api.route("/user_authenticated", methods=["GET"])
@@ -120,4 +133,6 @@ def test_auth():
         '500':
           description: User not authenticated
     """
-    return "User Authenticated", 200
+    return APIResponseHandler(
+        request_type=RequestType.GET, response_body="User Authenticated"
+    ).response
