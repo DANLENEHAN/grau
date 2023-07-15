@@ -21,6 +21,17 @@ class Gender(Enum):
     FEMALE = "female"
 
 
+class RequestType(Enum):
+    """
+    Enum for request type
+    """
+
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+
+
 class StatusCode(Enum):
     """
     HTTP response status codes.
@@ -29,6 +40,7 @@ class StatusCode(Enum):
     SUCCESS = 200
     CREATED = 201
     ACCEPTED = 202
+    NO_CONTENT = 204
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
     NOT_FOUND = 404

@@ -90,7 +90,7 @@ class TestUserSessionIntegration:
         endpoint="/logout",
         payload={"session_id": "testing123"},
         expected_response=b"Logout successful",
-        expected_response_code=200,
+        expected_response_code=201,
         method="POST",
     )
 
@@ -107,8 +107,11 @@ class TestUserSessionIntegration:
             },
             expected_response=b"Login successful"
             if successful
-            else b"Login failed, invalid credentials",
-            expected_response_code=200 if successful else 400,
+            else (
+                b'{"data":null,"message":"Login failed, '
+                b'invalid credentials"}\n'
+            ),
+            expected_response_code=201 if successful else 400,
             method="POST",
         )
 

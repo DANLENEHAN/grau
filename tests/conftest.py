@@ -190,9 +190,7 @@ def insert_user(db_session, user_factory, login_user):
 
         if user is None:
             user = user_factory()
-        _, response_code = create_user(db_session, user)
-        if response_code != 201:
-            raise Exception(f"Failed to insert user: {user}")
+        create_user(db_session, user)
         user = (
             db_session.query(User).filter(User.email == user["email"]).first()
         )
@@ -235,7 +233,7 @@ def login_user(client):
             "/login",
             json={"email": user.email, "password": decrypt_str(user.password)},
         )
-        if response.status_code != 200:
+        if response.status_code != 201:
             raise Exception(f"Login failed: {response.status_code}")
 
     return _login_user

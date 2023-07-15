@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 from uuid import uuid4
 
 from flask_login import login_user, logout_user
@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import scoped_session
 
 from grau.db.user.user_model import User, UserSchema
-from grau.exceptions.grau_exceptions import ResourceAlreadyExists
+from grau.handlers.grau_exceptions import BadRequest, ResourceAlreadyExists
 from grau.utils import decrypt_str
 
 
@@ -22,9 +22,7 @@ def get_user(db_session: scoped_session, email: str) -> User:
     return db_session.query(User).filter(User.email == email).one_or_none()
 
 
-def create_user(
-    db_session: scoped_session, user_dict: Dict[str, Any]
-) -> Tuple[str, int]:
+def create_user(db_session: scoped_session, user_dict: Dict[str, Any]) -> str:
     """
     Function to create a user in the database
     Args:
@@ -41,12 +39,12 @@ def create_user(
 
     db_session.add(user)
     db_session.commit()
-    return "User created successfully", 201
+    return "User created successfully"
 
 
 def attempt_login(
     db_session: scoped_session, email: str, password: str
-) -> Tuple[str, int]:
+) -> str:
     """
     Function to attempt to login a user
     Args:
@@ -61,13 +59,11 @@ def attempt_login(
         user.session_id = str(uuid4())
         db_session.commit()
         login_user(user, remember=True)
-        return "Login successful", 200
-    return "Login failed, invalid credentials", 400
+        return "Login successful"
+    raise BadRequest("Login failed, invalid credentials")
 
 
-def attempt_logout(
-    db_session: scoped_session, session_id: str
-) -> Tuple[str, int]:
+def attempt_logout(db_session: scoped_session, session_id: str) -> str:
     """
     Function to attempt to logout a user
     Args:
@@ -86,5 +82,5 @@ def attempt_logout(
             user.session_id = None
             db_session.commit()
             logout_user()
-            return "Logout successful", 200
-    return "Logout failed, user not logged in", 400
+            return "Logout successful"
+    raise BadRequest("Logout failed, invalid session ID")
