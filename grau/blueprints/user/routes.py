@@ -61,7 +61,7 @@ def login():
                   example: RLp6^$L2Ro
       security: []
       responses:
-        '200':
+        '201':
           description: >
             Login successful
             Note: The below doesn't actually work but is important
@@ -103,7 +103,7 @@ def logout():
       security:
         - cookieAuth: []
       responses:
-        '200':
+        '201':
           description: Logout successful
         '400':
           description: Logout failed due to invalid credentials
